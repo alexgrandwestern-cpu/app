@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contacto — Alex Solutions, Inc</title>
+  <meta name="description" content="Tarjeta de contacto de Alex Zavala · Alex Solutions, Inc · Licencias de licor y layout en Chicago." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body { min-height: 100vh; background: radial-gradient(1200px 600px at 50% -10%, #5a1220 0%, #2a0711 45%, #0b0205 100%); color: #fff; }
+    .wrap { width: min(980px, 100% - 32px); margin: 0 auto; padding: 40px 0 60px; }
+    .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+    .top a { color: rgba(255,255,255,.8); font-weight: 600; font-size: 14px; }
+    .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 26px; align-items: start; }
+    @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+    .vcard { background: rgba(255,255,255,.06); border: 1px solid rgba(242,207,133,.25); border-radius: 26px; padding: 34px; backdrop-filter: blur(8px); box-shadow: 0 30px 80px rgba(0,0,0,.4); }
+    .avatar { width: 84px; height: 84px; border-radius: 24px; background: linear-gradient(135deg, #c8942f, #f2cf85); color: #2a0711; display: grid; place-items: center; font: 700 34px "Fraunces", serif; margin-bottom: 18px; }
+    .vcard h1 { font-size: clamp(30px, 5vw, 44px); margin: 0 0 6px; }
+    .vcard .role { color: #f2cf85; font-weight: 600; margin: 0 0 4px; }
+    .vcard .co { color: rgba(255,255,255,.7); margin: 0 0 24px; }
+    .acts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .acts a, .acts button { display: flex; gap: 10px; align-items: center; justify-content: center; padding: 14px; border-radius: 14px; font: 600 15px var(--font); text-decoration: none; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; }
+    .acts a:hover, .acts button:hover { background: rgba(255,255,255,.16); text-decoration: none; }
+    .acts .gold { background: linear-gradient(135deg, #c8942f, #f2cf85); color: #2a0711; border: 0; grid-column: span 2; }
+    .lines { margin: 22px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; color: rgba(255,255,255,.85); font-size: 15px; }
+    .lines a { color: #f2cf85; }
+    .pending { margin-top: 18px; padding: 12px 14px; border-radius: 12px; background: rgba(242,207,133,.12); color: #f2cf85; font-size: 14px; }
+    .qrs { display: grid; gap: 18px; }
+    .qr { background: #fff; color: #1d1a16; border-radius: 22px; padding: 22px; text-align: center; }
+    .qr h3 { font: 700 16px var(--font); margin: 0 0 4px; }
+    .qr p { margin: 0 0 12px; color: #6b6359; font-size: 13px; }
+    .qr .code { display: grid; place-items: center; min-height: 200px; }
+    .qr .code img, .qr .code svg { width: 210px; height: 210px; image-rendering: pixelated; }
+    .qr .dl { margin-top: 10px; display: inline-block; font-weight: 600; font-size: 14px; color: #7a1f2b; background: none; border: 0; cursor: pointer; }
+    .services { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .services a { display: block; padding: 16px 18px; border-radius: 16px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); color: #fff; }
+    .services a:hover { border-color: #f2cf85; text-decoration: none; }
+    .services b { display: block; font-family: "Fraunces", serif; font-size: 18px; margin-bottom: 2px; }
+    .services span { color: rgba(255,255,255,.7); font-size: 13.5px; }
+    @media (max-width: 520px) { .acts { grid-template-columns: 1fr; } .acts .gold { grid-column: auto; } .services { grid-template-columns: 1fr; } .vcard { padding: 24px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <a href="/" class="logo" style="color:#fff"><span class="logo-mark">🍷</span> Alex Solutions, Inc</a>
+      <a href="/">Inicio →</a>
+    </div>
+    <div class="grid">
+      <section class="vcard" aria-label="Tarjeta de contacto">
+        <div class="avatar" id="av">AZ</div>
+        <h1 id="name">Alex Zavala</h1>
+        <p class="role" id="title"></p>
+        <p class="co" id="company"></p>
+        <div class="acts" id="acts"></div>
+        <ul class="lines" id="lines"></ul>
+        <div class="pending" id="pending" hidden>Teléfono y correo aún no configurados.</div>
+        <div class="services">
+          <a href="/"><b>Licencias de licor</b><span>Gestión completa del trámite en Chicago</span></a>
+          <a href="/asesoria-layout"><b>Layout de tiendas</b><span>Fine Wine &amp; Spirits: plano, estantería y diagnóstico</span></a>
+        </div>
+      </section>
+      <aside class="qrs">
+        <div class="qr"><h3>Abrir esta tarjeta</h3><p>Escanea para ver la tarjeta en tu celular</p><div class="code" id="qr-link"></div><button class="dl" data-target="qr-link" data-name="qr-tarjeta-alex-solutions.png">⬇ Descargar PNG</button></div>
+        <div class="qr"><h3>Guardar contacto</h3><p>Escanea para agregarlo a tus contactos (sin internet)</p><div class="code" id="qr-vcard"></div><button class="dl" data-target="qr-vcard" data-name="qr-vcard-alex-zavala.png">⬇ Descargar PNG</button></div>
+      </aside>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script>
+    const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    function drawQR(el, text) {
+      if (!window.qrcode) { el.textContent = "No se pudo generar el QR."; return; }
+      const q = qrcode(0, "M");
+      q.addData(unescape(encodeURIComponent(text)));
+      q.make();
+      el.innerHTML = q.createImgTag(8, 16, "Código QR");
+    }
+    fetch("/api/contact").then((r) => r.json()).then((c) => {
+      document.getElementById("name").textContent = c.name;
+      document.getElementById("title").textContent = c.title;
+      document.getElementById("company").textContent = `${c.company} · ${c.city}`;
+      document.getElementById("av").textContent = c.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+      document.title = `${c.name} — ${c.company}`;
+      const acts = [];
+      if (c.phone) acts.push(`<a href="tel:${esc(c.phone)}">📞 Llamar</a>`);
+      if (c.whatsapp) acts.push(`<a href="https://wa.me/${esc(c.whatsapp)}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
+      if (c.email) acts.push(`<a href="mailto:${esc(c.email)}">✉️ Correo</a>`);
+      acts.push(`<a href="/asesoria-layout">🍷 Asesoría</a>`);
+      acts.push(`<a class="gold" href="/contacto.vcf">⬇ Guardar contacto</a>`);
+      document.getElementById("acts").innerHTML = acts.join("");
+      const lines = [];
+      if (c.phone) lines.push(`📱 <a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>`);
+      if (c.email) lines.push(`✉️ <a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`);
+      if (c.website) lines.push(`🌐 <a href="${esc(c.website)}">${esc(c.website.replace(/^https?:\/\//, ""))}</a>`);
+      if (c.instagram) lines.push(`📸 <a href="https://instagram.com/${esc(c.instagram.replace(/^@/, ""))}" target="_blank" rel="noopener">${esc(c.instagram)}</a>`);
+      if (c.linkedin) lines.push(`💼 <a href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`);
+      lines.push(`📍 ${esc(c.city)}`);
+      document.getElementById("lines").innerHTML = lines.map((l) => `<li>${l}</li>`).join("");
+      document.getElementById("pending").hidden = !!(c.phone || c.email);
+      drawQR(document.getElementById("qr-link"), `${location.origin}/contacto`);
+      drawQR(document.getElementById("qr-vcard"), c.vcard);
+    });
+    document.querySelectorAll(".dl").forEach((b) => b.addEventListener("click", () => {
+      const img = document.querySelector(`#${b.dataset.target} img`);
+      if (!img) return;
+      const cv = document.createElement("canvas"); cv.width = 1024; cv.height = 1024;
+      const ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false; ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 1024, 1024);
+      ctx.drawImage(img, 0, 0, 1024, 1024);
+      const a = document.createElement("a"); a.href = cv.toDataURL("image/png"); a.download = b.dataset.name; a.click();
+    }));
+  </script>
+</body>
+</html>

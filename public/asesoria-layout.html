@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asesoría de layout — Alex Solutions, Inc</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="description" content="Guía interactiva para clientes nuevos y actuales: cómo organizar el layout de una tienda de vinos finos y licores para maximizar visibilidad y ventas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: hero with two client paths → interactive floor plan → shelf planogram → space-to-sales calculator → self-diagnostic → roadmap → consult request. Single column on phones. */
+:root{
+  --bg:#F7F2EA; --surface:#FFFDF9; --surface-2:#F1E9DC; --line:#E1D5C3;
+  --ink:#2A1A1F; --muted:#6E5B60; --accent:#7A1F35; --accent-soft:#F3E0E4; --on-accent:#FFF8F2;
+  --gold:#A77A1F; --gold-soft:#F5EAD2; --ok:#2F7A4F; --warn:#B4541A;
+  --z1:#E9D9C1; --z2:#F2C9CF; --z3:#D9C6E6; --z4:#C9DCEB; --z5:#CFE5D3; --z6:#F4E1B5;
+  --shadow:0 1px 2px rgba(42,26,31,.06),0 10px 30px rgba(42,26,31,.07);
+  --f-display:"Fraunces",Georgia,serif;
+  --f-body:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  --r:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17100F; --surface:#211817; --surface-2:#2B201E; --line:#3D2E2B;
+  --ink:#F2E8E2; --muted:#B5A39E; --accent:#E07C93; --accent-soft:#3D1F27; --on-accent:#230C12;
+  --gold:#E2B95C; --gold-soft:#3A2E17; --ok:#6CCB93; --warn:#F09A62;
+  --z1:#4A3D2C; --z2:#55303A; --z3:#3F3350; --z4:#2C4152; --z5:#2E4836; --z6:#53452A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17100F; --surface:#211817; --surface-2:#2B201E; --line:#3D2E2B;
+  --ink:#F2E8E2; --muted:#B5A39E; --accent:#E07C93; --accent-soft:#3D1F27; --on-accent:#230C12;
+  --gold:#E2B95C; --gold-soft:#3A2E17; --ok:#6CCB93; --warn:#F09A62;
+  --z1:#4A3D2C; --z2:#55303A; --z3:#3F3350; --z4:#2C4152; --z5:#2E4836; --z6:#53452A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.15;margin:0 0 .4em;letter-spacing:-.01em}
+h2{font-size:clamp(1.6rem,3.5vw,2.3rem)}
+h3{font-size:1.2rem}
+p{margin:0 0 1em}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+section{padding:64px 0;border-top:1px solid var(--line)}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.6em}
+.lede{color:var(--muted);max-width:62ch;font-size:1.05rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px}
+.btn{display:inline-flex;align-items:center;gap:.5em;border:0;border-radius:999px;padding:.75em 1.3em;background:var(--accent);color:var(--on-accent);font-weight:600;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;height:60px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.15rem;display:flex;align-items:center;gap:.45em;white-space:nowrap}
+.brand svg{color:var(--accent)}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{color:var(--muted);text-decoration:none;font-size:.9rem;padding:.4em .7em;border-radius:8px;white-space:nowrap}
+.nav a:hover{color:var(--ink);background:var(--surface-2)}
+.theme-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;width:36px;height:36px;cursor:pointer;flex:none;display:grid;place-items:center}
+@media (max-width:760px){.nav{display:none}.theme-btn{margin-left:auto}}
+
+/* hero */
+.hero{padding:72px 0 56px;border-top:0}
+.hero h1{font-size:clamp(2.2rem,6vw,4rem);max-width:16ch}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.paths{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:36px}
+.path{display:flex;flex-direction:column;gap:.4em;text-align:left;cursor:pointer;transition:transform .15s,border-color .15s}
+.path:hover{transform:translateY(-2px);border-color:var(--accent)}
+.path[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+.path .tag{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+.path h3{margin:0}
+.path p{color:var(--muted);margin:0;font-size:.95rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.stat b{display:block;font-family:var(--f-display);font-size:2rem;color:var(--accent);line-height:1.1}
+.stat span{color:var(--muted);font-size:.88rem}
+@media (max-width:760px){.paths{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== Impact hero: always deep wine + gold, regardless of theme ===== */
+.hero{position:relative;overflow:hidden;padding:0;border:0;color:#F8EEE6;
+  background:
+    radial-gradient(900px 600px at 78% 40%,rgba(196,48,82,.45),transparent 60%),
+    radial-gradient(700px 500px at 10% 100%,rgba(212,163,72,.18),transparent 60%),
+    linear-gradient(160deg,#2A0711 0%,#160409 55%,#0B0205 100%)}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(rgba(255,230,190,.5) 1px,transparent 1.4px);background-size:46px 46px;
+  mask-image:radial-gradient(ellipse at 70% 40%,#000 0%,transparent 70%)}
+.hero-inner{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;min-height:min(88vh,820px);padding-top:56px;padding-bottom:40px}
+.hero .eyebrow{color:#E9C27A;display:inline-flex;align-items:center;gap:.6em}
+.hero .eyebrow::before{content:"";width:34px;height:1px;background:#E9C27A}
+.hero .company{font-family:var(--f-display);font-weight:700;font-size:clamp(1rem,1.6vw,1.15rem);letter-spacing:.32em;text-transform:uppercase;color:#E9C27A;margin-bottom:18px}
+.hero h1{font-size:clamp(2.6rem,7vw,5.4rem);max-width:12ch;line-height:1.02;color:#FFF6EE;margin-bottom:.35em}
+.hero h1 em{font-style:italic;background:linear-gradient(100deg,#F6D58E 0%,#D4A348 35%,#FFF1C9 50%,#D4A348 65%,#F6D58E 100%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite}
+@keyframes shine{to{background-position:-220% center}}
+.hero .lede{color:rgba(248,238,230,.78);font-size:1.12rem}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn.gold{background:linear-gradient(135deg,#F2CF85,#C8942F);color:#2A0711;box-shadow:0 10px 30px rgba(212,163,72,.35);padding:.95em 1.6em;font-size:1.02rem}
+.btn.gold:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(212,163,72,.5)}
+.btn.glass{background:rgba(255,255,255,.06);color:#FFF6EE;border:1px solid rgba(255,240,220,.28);padding:.95em 1.6em;font-size:1.02rem;backdrop-filter:blur(6px)}
+.btn.glass:hover{background:rgba(255,255,255,.12)}
+.btn{transition:transform .15s,box-shadow .15s,background .15s}
+.hero-art{position:relative;height:100%;min-height:440px}
+.hero-art svg{position:absolute;inset:0;width:100%;height:100%}
+.float1{animation:float 7s ease-in-out infinite}
+.float2{animation:float 8s ease-in-out -2s infinite}
+.float3{animation:float 6s ease-in-out -4s infinite}
+@keyframes float{50%{transform:translateY(-14px)}}
+.spark{animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{50%{opacity:.15}}
+.hero .stats{position:relative;margin:0 0 56px;padding:22px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,240,220,.14);backdrop-filter:blur(8px)}
+.hero .stat b{color:#F2CF85}
+.hero .stat span{color:rgba(248,238,230,.7)}
+.trust{display:flex;flex-wrap:wrap;gap:22px;margin-top:28px;color:rgba(248,238,230,.7);font-size:.9rem}
+.trust span{display:inline-flex;align-items:center;gap:.45em}
+.trust span::before{content:"✦";color:#E9C27A}
+.skyline{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
+.skyline svg{position:relative;width:100%;height:auto;aspect-ratio:1440/320;display:block}
+.skyline .glow{position:absolute;inset:auto 0 0 0;height:75%;background:radial-gradient(70% 80% at 50% 100%,rgba(240,130,95,.55),rgba(196,48,82,.25) 45%,transparent 75%)}
+.skyline .lights{animation:twinkle 6s ease-in-out infinite;animation-delay:-1s}
+.hero-inner,.hero .wrap{position:relative;z-index:1}
+.hero .stats{margin-bottom:220px;background:rgba(20,4,9,.55)}
+.skyline .glow{height:180%}
+@media (max-width:860px){.skyline svg{aspect-ratio:auto;height:200px}.hero .stats{margin-bottom:120px}}
+.paths-wrap{background:var(--bg);border-top:0;padding:56px 0 8px}
+.paths-wrap .paths{margin-top:18px}
+@media (prefers-reduced-motion:reduce){.hero h1 em,.float1,.float2,.float3,.spark{animation:none}}
+@media (max-width:860px){.hero-inner{grid-template-columns:1fr;min-height:0;padding-top:40px}.hero-art{min-height:300px;order:-1;margin:0 -16px}}
+
+/* plan */
+.plan-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:20px;margin-top:28px;align-items:start}
+.plan svg{width:100%;height:auto;display:block}
+.zone{cursor:pointer;transition:opacity .15s}
+.zone rect,.zone path{stroke:var(--ink);stroke-opacity:.25;stroke-width:1.5}
+.zone text{font:600 13px var(--f-body);fill:var(--ink);pointer-events:none}
+.zone .num{font:700 12px var(--f-body);fill:var(--on-accent)}
+.zone .badge{fill:var(--accent)}
+.zone:hover rect,.zone:focus rect{stroke:var(--accent);stroke-opacity:1;stroke-width:3}
+.zone.active rect{stroke:var(--accent);stroke-opacity:1;stroke-width:3.5}
+.plan .flow{fill:none;stroke:var(--gold);stroke-width:3;stroke-dasharray:8 8;animation:dash 1.4s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-32}}
+@media (prefers-reduced-motion:reduce){.plan .flow{animation:none}}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.legend button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.3em .8em;font-size:.82rem;cursor:pointer}
+.legend button.active{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.zone-panel h3{display:flex;align-items:center;gap:.5em}
+.zone-panel .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:700 .85rem var(--f-body);flex:none}
+.zone-panel dl{margin:0}
+.zone-panel dt{font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-top:14px}
+.zone-panel dd{margin:4px 0 0}
+.zone-panel ul{margin:4px 0 0;padding-left:1.1em}
+.zone-panel .err{background:var(--accent-soft);border-radius:10px;padding:10px 12px;margin-top:14px;font-size:.93rem}
+@media (max-width:860px){.plan-grid{grid-template-columns:1fr}}
+
+/* shelf */
+.shelf-grid{display:grid;grid-template-columns:340px 1fr;gap:28px;margin-top:28px;align-items:center}
+.shelf{display:flex;flex-direction:column;gap:6px;background:var(--surface-2);padding:14px;border-radius:var(--r);border:1px solid var(--line)}
+.lvl{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center;border:0;background:var(--surface);border-radius:10px;padding:10px;cursor:pointer;text-align:left;border-bottom:4px solid var(--line)}
+.lvl.active{outline:3px solid var(--accent)}
+.lvl small{color:var(--muted);font-size:.75rem;line-height:1.3}
+.bottles{display:flex;gap:4px;align-items:flex-end;height:44px}
+.bottles i{display:block;width:12px;border-radius:5px 5px 2px 2px;background:var(--c,var(--accent));opacity:.85}
+.lvl-info .pct{font-family:var(--f-display);font-size:3rem;color:var(--accent);line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.chips li{background:var(--gold-soft);border-radius:999px;padding:.25em .8em;font-size:.88rem}
+@media (max-width:760px){.shelf-grid{grid-template-columns:1fr}}
+
+/* principles */
+.princ{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.princ .card h3{font-size:1.05rem}
+.princ .card p{color:var(--muted);font-size:.95rem;margin:0}
+.princ .ico{width:40px;height:40px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin-bottom:12px}
+@media (max-width:860px){.princ{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.princ{grid-template-columns:1fr}}
+
+/* calculator */
+.calc{margin-top:28px;overflow-x:auto}
+.calc table{width:100%;border-collapse:collapse;min-width:620px}
+.calc th,.calc td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:.95rem}
+.calc th{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.calc input[type=number]{width:80px;padding:.4em .5em;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);font-variant-numeric:tabular-nums}
+.calc td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:10px;background:var(--surface-2);border-radius:5px;position:relative;min-width:120px}
+.bar span{position:absolute;inset:0 auto 0 0;border-radius:5px}
+.bar .cur{background:var(--muted);opacity:.45}
+.bar .rec{background:var(--accent);height:4px;top:3px}
+.delta.up{color:var(--ok);font-weight:600}
+.delta.down{color:var(--warn);font-weight:600}
+.calc-top{display:flex;flex-wrap:wrap;gap:16px;align-items:end;margin-bottom:12px}
+.calc-top label{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:4px}
+.calc-top input{width:120px;padding:.5em;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.note{font-size:.88rem;color:var(--muted);margin-top:12px}
+.warnmsg{color:var(--warn);font-weight:600}
+
+/* diagnostic */
+.diag{display:grid;grid-template-columns:1fr 300px;gap:20px;margin-top:28px;align-items:start}
+.diag fieldset{border:0;margin:0 0 18px;padding:0}
+.diag legend{font-family:var(--f-display);font-weight:700;font-size:1.1rem;margin-bottom:8px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:10px;cursor:pointer}
+.check:hover{background:var(--surface-2)}
+.check input{width:20px;height:20px;accent-color:var(--accent);margin-top:2px;flex:none}
+.score{position:sticky;top:76px;text-align:center}
+.ring{width:150px;height:150px;margin:0 auto 10px;display:block}
+.ring circle{fill:none;stroke-width:12}
+.ring .bg{stroke:var(--surface-2)}
+.ring .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .4s}
+.ring text{font:700 34px var(--f-display);fill:var(--ink)}
+.score .lvlname{font-weight:600;font-size:1.05rem}
+.score ol{text-align:left;padding-left:1.2em;font-size:.92rem;margin:10px 0 0}
+.score ol li{margin-bottom:6px}
+@media (max-width:860px){.diag{grid-template-columns:1fr}.score{position:static}}
+
+/* roadmap */
+.tabs{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:4px;margin-top:20px}
+.tabs button{border:0;background:transparent;padding:.55em 1.2em;border-radius:999px;cursor:pointer;font-weight:600;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+.steps{list-style:none;padding:0;margin:24px 0 0;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
+.steps li{counter-increment:s;position:relative}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-weight:700;margin-bottom:10px}
+.steps .when{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);font-weight:600}
+.steps h3{font-size:1.05rem;margin:.2em 0 .4em}
+.steps ul{margin:0;padding-left:1.1em;color:var(--muted);font-size:.93rem}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.steps{grid-template-columns:1fr}}
+
+/* form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.form-grid label{display:flex;flex-direction:column;gap:6px;font-size:.88rem;font-weight:500}
+.form-grid .full{grid-column:1/-1}
+.form-grid input,.form-grid select,.form-grid textarea{padding:.65em .8em;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.form-grid textarea{min-height:90px;resize:vertical}
+.summary{white-space:pre-wrap;background:var(--surface-2);border-radius:10px;padding:14px;font-size:.9rem;margin-top:16px;border:1px dashed var(--line)}
+@media (max-width:560px){.form-grid{grid-template-columns:1fr}}
+footer{padding:32px 0 48px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
+@media print{.top,.theme-btn,#solicitar form{display:none}section{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" style="color:inherit;text-decoration:none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2h8l-1 7a3 3 0 0 1-6 0Z"/><path d="M12 12v8"/><path d="M8 22h8"/></svg>
+      Alex Solutions, Inc
+    </a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="#plano">Plano</a>
+      <a href="#estante">Estantería</a>
+      <a href="#principios">Principios</a>
+      <a href="#espacio">Espacio vs. ventas</a>
+      <a href="#diagnostico">Diagnóstico</a>
+      <a href="#plan">Plan de acción</a>
+      <a href="#solicitar">Solicitar asesoría</a>
+      <a href="/">Licencias de licor</a>
+      <a href="/contacto">Contacto</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" aria-label="Cambiar tema claro u oscuro">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero">
+  <div class="skyline" aria-hidden="true">
+    <div class="glow"></div>
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="cityFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14040A"/><stop offset="1" stop-color="#050102"/></linearGradient>
+        <pattern id="win" width="9" height="12" patternUnits="userSpaceOnUse"><rect x="2" y="3" width="3" height="5" fill="#F2CF85"/></pattern>
+        <pattern id="win2" width="13" height="18" patternUnits="userSpaceOnUse"><rect x="4" y="5" width="3" height="5" fill="#FFE6B0"/></pattern>
+        <g id="city">
+          <!-- far-left low rise -->
+          <rect x="0" y="230" width="40" height="90"/><rect x="40" y="200" width="34" height="120"/><rect x="74" y="245" width="30" height="75"/>
+          <rect x="104" y="185" width="38" height="135"/><rect x="142" y="215" width="44" height="105"/><rect x="186" y="170" width="30" height="150"/>
+          <rect x="216" y="225" width="40" height="95"/><rect x="256" y="200" width="36" height="120"/>
+          <!-- Marina City twin "corn cobs" -->
+          <path d="M296 320V186a14 14 0 0 1 28 0V320Z"/><path d="M332 320V186a14 14 0 0 1 28 0V320Z"/>
+          <rect x="364" y="210" width="28" height="110"/>
+          <!-- 311 S Wacker with crown -->
+          <rect x="398" y="118" width="40" height="202"/><rect x="404" y="104" width="28" height="16"/><ellipse cx="418" cy="104" rx="14" ry="6"/>
+          <rect x="440" y="190" width="36" height="130"/>
+          <!-- Willis Tower: bundled tubes + twin antennas -->
+          <rect x="482" y="118" width="88" height="202"/><rect x="490" y="80" width="72" height="40"/><rect x="502" y="48" width="48" height="34"/>
+          <rect x="511" y="2" width="4" height="48"/><rect x="537" y="2" width="4" height="48"/>
+          <rect x="574" y="160" width="34" height="160"/>
+          <!-- Chase / mid towers -->
+          <path d="M612 320V140h38v180Z"/><rect x="654" y="185" width="22" height="135"/>
+          <!-- Trump Tower setbacks + spire -->
+          <rect x="680" y="130" width="58" height="190"/><rect x="687" y="96" width="44" height="36"/><rect x="695" y="64" width="28" height="34"/>
+          <path d="M707 64l2-48 2 48Z"/>
+          <rect x="742" y="200" width="40" height="120"/>
+          <!-- Aon Center: tall slab -->
+          <rect x="788" y="56" width="58" height="264"/><rect x="785" y="52" width="64" height="6"/>
+          <rect x="850" y="175" width="26" height="145"/>
+          <!-- Smurfit-Stone "diamond" -->
+          <path d="M880 320V128l46-36v228Z"/>
+          <rect x="930" y="195" width="40" height="125"/>
+          <!-- John Hancock: tapered + antennas -->
+          <path d="M976 320l12-252h56l12 252Z"/>
+          <rect x="1000" y="10" width="4" height="58"/><rect x="1028" y="18" width="4" height="50"/>
+          <!-- right side -->
+          <rect x="1062" y="150" width="34" height="170"/><rect x="1096" y="205" width="40" height="115"/>
+          <path d="M1136 320V160l18-14 18 14v160Z"/><rect x="1176" y="220" width="36" height="100"/>
+          <rect x="1212" y="182" width="30" height="138"/><rect x="1242" y="236" width="44" height="84"/>
+          <rect x="1286" y="196" width="34" height="124"/><rect x="1320" y="226" width="40" height="94"/>
+          <rect x="1360" y="205" width="30" height="115"/><rect x="1390" y="240" width="50" height="80"/>
+        </g>
+      </defs>
+      <use href="#city" fill="url(#cityFill)"/>
+      <use href="#city" fill="url(#win)" opacity=".3"/>
+      <use class="lights" href="#city" fill="url(#win2)" opacity=".45"/>
+      <!-- Hancock X-bracing -->
+      <g stroke="#F2CF85" stroke-opacity=".18" stroke-width="1.2" fill="none">
+        <path d="M990 300l58-60M990 240l58 60M992 240l54-56M993 184l52 56M994 184l50-56M996 128l48 56M997 128l46-56M999 72l44 56"/>
+      </g>
+      <!-- beacon lights -->
+      <g fill="#FF5A5A"><circle class="spark" cx="513" cy="3" r="2.2"/><circle class="spark" style="animation-delay:-1.4s" cx="539" cy="3" r="2.2"/><circle class="spark" style="animation-delay:-.7s" cx="1002" cy="11" r="2.2"/><circle class="spark" style="animation-delay:-2s" cx="709" cy="17" r="1.8"/></g>
+      <rect x="0" y="316" width="1440" height="4" fill="#E9C27A" opacity=".35"/>
+    </svg>
+  </div>
+  <div class="wrap hero-inner">
+    <div>
+      <div class="company">Alex Solutions, Inc</div>
+      <div class="eyebrow">Layout &amp; merchandising · Fine Wine &amp; Spirits</div>
+      <h1>Cada botella donde <em>se vende sola</em>.</h1>
+      <p class="lede">Transformamos tu tienda de vinos y licores en un espacio que atrae, guía y vende. Zonas estratégicas, estantes que destacan tus productos premium y cada metro trabajando para ti.</p>
+      <div class="cta">
+        <a class="btn gold" href="#solicitar">Solicitar asesoría
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn glass" href="#plano">Ver el plano ideal</a>
+      </div>
+      <div class="trust"><span>Clientes nuevos y actuales</span><span>Plano interactivo</span><span>Diagnóstico gratis</span></div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 500 520" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="gGlass" x1="0" x2="1"><stop offset="0" stop-color="#3A0B18"/><stop offset=".45" stop-color="#7A1F35"/><stop offset=".55" stop-color="#A33A55"/><stop offset="1" stop-color="#2A0711"/></linearGradient>
+          <linearGradient id="gGreen" x1="0" x2="1"><stop offset="0" stop-color="#0E1F17"/><stop offset=".45" stop-color="#1F4A36"/><stop offset=".55" stop-color="#3A6E55"/><stop offset="1" stop-color="#0B1712"/></linearGradient>
+          <linearGradient id="gAmber" x1="0" x2="1"><stop offset="0" stop-color="#5A2E0A"/><stop offset=".45" stop-color="#B8701E"/><stop offset=".55" stop-color="#E3A24A"/><stop offset="1" stop-color="#4A2508"/></linearGradient>
+          <linearGradient id="gGold" x1="0" x2="1"><stop offset="0" stop-color="#C8942F"/><stop offset=".5" stop-color="#F6D58E"/><stop offset="1" stop-color="#B07E22"/></linearGradient>
+          <radialGradient id="gHalo"><stop offset="0" stop-color="#F2CF85" stop-opacity=".45"/><stop offset="1" stop-color="#F2CF85" stop-opacity="0"/></radialGradient>
+        </defs>
+        <ellipse cx="260" cy="270" rx="230" ry="230" fill="url(#gHalo)"/>
+        <circle cx="260" cy="270" r="190" fill="none" stroke="#E9C27A" stroke-opacity=".35" stroke-width="1"/>
+        <circle cx="260" cy="270" r="150" fill="none" stroke="#E9C27A" stroke-opacity=".18" stroke-width="1" stroke-dasharray="3 7"/>
+        <!-- wine bottle -->
+        <g class="float1">
+          <path d="M235 40h34v70c0 18 34 34 34 76v260a16 16 0 0 1-16 16h-70a16 16 0 0 1-16-16V186c0-42 34-58 34-76Z" fill="url(#gGlass)"/>
+          <rect x="233" y="30" width="38" height="26" rx="4" fill="url(#gGold)"/>
+          <rect x="209" y="250" width="86" height="110" rx="4" fill="#F8EEE6"/>
+          <rect x="209" y="250" width="86" height="6" fill="url(#gGold)"/><rect x="209" y="354" width="86" height="6" fill="url(#gGold)"/>
+          <text x="252" y="292" text-anchor="middle" style="font:700 15px Fraunces,serif;fill:#7A1F35">ALEX</text>
+          <text x="252" y="310" text-anchor="middle" style="font:600 8px 'Instrument Sans',sans-serif;fill:#7A1F35;letter-spacing:2px">SOLUTIONS</text>
+          <text x="252" y="336" text-anchor="middle" style="font:italic 500 11px Fraunces,serif;fill:#A77A1F">Reserva</text>
+          <path d="M226 190c-6 40-6 180-2 250" stroke="#fff" stroke-opacity=".22" stroke-width="6" stroke-linecap="round" fill="none"/>
+        </g>
+        <!-- whisky decanter -->
+        <g class="float2">
+          <path d="M355 250h40v22c26 10 40 30 40 60v120a14 14 0 0 1-14 14h-92a14 14 0 0 1-14-14V332c0-30 14-50 40-60Z" fill="url(#gAmber)" opacity=".95"/>
+          <rect x="350" y="232" width="50" height="22" rx="6" fill="url(#gGold)"/>
+          <rect x="340" y="370" width="70" height="44" rx="3" fill="#160409" stroke="url(#gGold)" stroke-width="1.5"/>
+          <text x="375" y="397" text-anchor="middle" style="font:700 11px Fraunces,serif;fill:#F2CF85;letter-spacing:1px">SINGLE</text>
+          <path d="M335 340c-2 30-2 80 0 110" stroke="#fff" stroke-opacity=".25" stroke-width="5" stroke-linecap="round" fill="none"/>
+        </g>
+        <!-- champagne bottle -->
+        <g class="float3">
+          <path d="M120 150h24v60c0 14 26 28 26 60v190a12 12 0 0 1-12 12h-52a12 12 0 0 1-12-12V270c0-32 26-46 26-60Z" fill="url(#gGreen)"/>
+          <path d="M116 120h32v52h-32Z" fill="url(#gGold)"/>
+          <rect x="98" y="320" width="68" height="70" rx="3" fill="url(#gGold)"/>
+          <text x="132" y="360" text-anchor="middle" style="font:italic 700 12px Fraunces,serif;fill:#2A0711">Brut</text>
+          <path d="M105 280c-3 40-3 130 0 170" stroke="#fff" stroke-opacity=".2" stroke-width="5" stroke-linecap="round" fill="none"/>
+        </g>
+        <!-- sparkles -->
+        <g fill="#F6D58E">
+          <path class="spark" d="M70 90l4 10 10 4-10 4-4 10-4-10-10-4 10-4Z"/>
+          <path class="spark" style="animation-delay:-1s" d="M430 120l3 8 8 3-8 3-3 8-3-8-8-3 8-3Z"/>
+          <path class="spark" style="animation-delay:-2s" d="M450 470l3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
+          <circle class="spark" style="animation-delay:-.5s" cx="190" cy="70" r="2.5"/>
+          <circle class="spark" style="animation-delay:-1.6s" cx="60" cy="380" r="2"/>
+          <circle class="spark" style="animation-delay:-2.4s" cx="470" cy="300" r="2.5"/>
+        </g>
+        <ellipse cx="260" cy="488" rx="210" ry="10" fill="#000" opacity=".35"/>
+      </svg>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><b>Derecha</b><span>Hacia donde gira la mayoría de clientes al entrar: ahí van las novedades.</span></div>
+      <div class="stat"><b>1.2–1.6 m</b><span>Altura de los ojos: el estante que más vende. Pon ahí lo de mayor margen.</span></div>
+      <div class="stat"><b>3 seg.</b><span>Lo que un cliente le dedica a un estante. La señalización tiene que ser clara.</span></div>
+      <div class="stat"><b>Al fondo</b><span>Los productos que el cliente siempre busca (frío, cerveza) para que recorra toda la tienda.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="paths-wrap">
+  <div class="wrap">
+    <div class="eyebrow">Empieza aquí</div>
+    <h2>¿Cuál es tu situación?</h2>
+    <div class="paths" role="group" aria-label="Elige tu situación">
+      <button class="card path" data-path="nuevo" aria-pressed="false">
+        <span class="tag">Cliente nuevo</span>
+        <h3>Voy a abrir o remodelar mi tienda</h3>
+        <p>Diseñemos el layout desde cero: flujo del cliente, zonas, mobiliario y surtido inicial.</p>
+      </button>
+      <button class="card path" data-path="actual" aria-pressed="false">
+        <span class="tag">Cliente actual</span>
+        <h3>Ya tengo tienda y quiero vender más</h3>
+        <p>Diagnostiquemos lo que tienes, reubiquemos categorías y recuperemos espacio que no está rindiendo.</p>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FLOOR PLAN -->
+<section id="plano">
+  <div class="wrap">
+    <div class="eyebrow">1 · El plano de la tienda</div>
+    <h2>Diseña el recorrido antes de llenar los estantes</h2>
+    <p class="lede">Toca cada zona del plano para ver qué colocar ahí, por qué funciona y el error más común. La línea dorada es el recorrido ideal del cliente.</p>
+    <div class="plan-grid">
+      <div class="card plan">
+        <svg viewBox="0 0 800 540" role="img" aria-label="Plano de tienda recomendado con 10 zonas">
+          <rect x="10" y="10" width="780" height="520" rx="10" fill="var(--surface-2)" stroke="var(--line)" stroke-width="2"/>
+          <!-- zones -->
+          <g class="zone" data-z="1" tabindex="0" role="button" aria-label="Zona 1: Entrada y descompresión">
+            <rect x="470" y="430" width="200" height="90" rx="8" fill="var(--z1)"/>
+            <circle class="badge" cx="490" cy="450" r="12"/><text class="num" x="490" y="454" text-anchor="middle">1</text>
+            <text x="570" y="480" text-anchor="middle">Entrada</text>
+          </g>
+          <g class="zone" data-z="2" tabindex="0" role="button" aria-label="Zona 2: Muro de poder, novedades">
+            <rect x="690" y="250" width="90" height="270" rx="8" fill="var(--z2)"/>
+            <circle class="badge" cx="710" cy="270" r="12"/><text class="num" x="710" y="274" text-anchor="middle">2</text>
+            <text x="735" y="390" text-anchor="middle">Muro de</text><text x="735" y="406" text-anchor="middle">poder</text>
+          </g>
+          <g class="zone" data-z="3" tabindex="0" role="button" aria-label="Zona 3: Vinos por país y región">
+            <rect x="690" y="20" width="90" height="220" rx="8" fill="var(--z3)"/>
+            <circle class="badge" cx="710" cy="40" r="12"/><text class="num" x="710" y="44" text-anchor="middle">3</text>
+            <text x="735" y="125" text-anchor="middle">Vinos</text><text x="735" y="141" text-anchor="middle">por país</text>
+          </g>
+          <g class="zone" data-z="4" tabindex="0" role="button" aria-label="Zona 4: Sala de vinos finos">
+            <rect x="480" y="20" width="200" height="110" rx="8" fill="var(--z6)"/>
+            <circle class="badge" cx="500" cy="40" r="12"/><text class="num" x="500" y="44" text-anchor="middle">4</text>
+            <text x="580" y="80" text-anchor="middle">Sala de vinos finos</text>
+          </g>
+          <g class="zone" data-z="5" tabindex="0" role="button" aria-label="Zona 5: Refrigerados al fondo">
+            <rect x="200" y="20" width="270" height="70" rx="8" fill="var(--z4)"/>
+            <circle class="badge" cx="220" cy="40" r="12"/><text class="num" x="220" y="44" text-anchor="middle">5</text>
+            <text x="335" y="60" text-anchor="middle">Refrigerados · cerveza · espumosos</text>
+          </g>
+          <g class="zone" data-z="6" tabindex="0" role="button" aria-label="Zona 6: Destilados por categoría">
+            <rect x="20" y="20" width="90" height="330" rx="8" fill="var(--z5)"/>
+            <circle class="badge" cx="40" cy="40" r="12"/><text class="num" x="40" y="44" text-anchor="middle">6</text>
+            <text x="65" y="180" text-anchor="middle">Destilados</text><text x="65" y="196" text-anchor="middle">por</text><text x="65" y="212" text-anchor="middle">categoría</text>
+          </g>
+          <g class="zone" data-z="7" tabindex="0" role="button" aria-label="Zona 7: Góndolas centrales y cabeceras">
+            <rect x="240" y="140" width="60" height="200" rx="6" fill="var(--z3)"/>
+            <rect x="360" y="140" width="60" height="200" rx="6" fill="var(--z3)"/>
+            <rect x="480" y="160" width="60" height="180" rx="6" fill="var(--z3)"/>
+            <rect x="240" y="345" width="60" height="22" rx="4" fill="var(--z2)"/>
+            <rect x="360" y="345" width="60" height="22" rx="4" fill="var(--z2)"/>
+            <rect x="480" y="345" width="60" height="22" rx="4" fill="var(--z2)"/>
+            <circle class="badge" cx="270" cy="160" r="12"/><text class="num" x="270" y="164" text-anchor="middle">7</text>
+            <text x="390" y="390" text-anchor="middle">Góndolas + cabeceras</text>
+          </g>
+          <g class="zone" data-z="8" tabindex="0" role="button" aria-label="Zona 8: Vitrina premium cerrada">
+            <rect x="20" y="360" width="90" height="70" rx="8" fill="var(--z6)"/>
+            <circle class="badge" cx="40" cy="380" r="12"/><text class="num" x="40" y="384" text-anchor="middle">8</text>
+            <text x="65" y="410" text-anchor="middle">Premium</text>
+          </g>
+          <g class="zone" data-z="9" tabindex="0" role="button" aria-label="Zona 9: Caja e impulso">
+            <rect x="130" y="430" width="230" height="90" rx="8" fill="var(--z1)"/>
+            <circle class="badge" cx="150" cy="450" r="12"/><text class="num" x="150" y="454" text-anchor="middle">9</text>
+            <text x="245" y="480" text-anchor="middle">Caja · impulso</text>
+          </g>
+          <g class="zone" data-z="10" tabindex="0" role="button" aria-label="Zona 10: Degustación y regalos">
+            <rect x="580" y="160" width="90" height="130" rx="8" fill="var(--z5)"/>
+            <circle class="badge" cx="600" cy="180" r="12"/><text class="num" x="600" y="184" text-anchor="middle">10</text>
+            <text x="625" y="230" text-anchor="middle">Cata y</text><text x="625" y="246" text-anchor="middle">regalos</text>
+          </g>
+          <!-- flow -->
+          <path class="flow" d="M570 420 C 640 400, 660 330, 660 260 S 650 120, 560 140 S 420 110, 330 115 S 150 110, 140 200 S 150 380, 200 410" />
+          <polygon points="200,410 186,398 206,396" fill="var(--gold)"/>
+          <text x="400" y="525" text-anchor="middle" style="font:600 11px var(--f-body);fill:var(--muted);letter-spacing:.1em">PUERTA · CALLE</text>
+        </svg>
+        <div class="legend" id="legend" aria-label="Zonas"></div>
+      </div>
+      <div class="card zone-panel" id="zonePanel" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SHELF -->
+<section id="estante">
+  <div class="wrap">
+    <div class="eyebrow">2 · La estantería</div>
+    <h2>"A la altura de los ojos, a la altura de la compra"</h2>
+    <p class="lede">No todos los niveles de un estante venden igual. Toca cada nivel para ver qué colocar y qué parte aproximada de las ventas de esa sección suele generar.</p>
+    <div class="shelf-grid">
+      <div class="shelf" id="shelf" role="group" aria-label="Niveles del estante"></div>
+      <div class="card lvl-info" id="lvlInfo" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRINCIPLES -->
+<section id="principios">
+  <div class="wrap">
+    <div class="eyebrow">3 · Reglas de oro</div>
+    <h2>Seis principios que aplican a cualquier tienda</h2>
+    <div class="princ">
+      <div class="card"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="18"/></svg></div><h3>Bloques verticales de marca</h3><p>Coloca cada marca o variedad en una columna de arriba a abajo, no en filas horizontales. El ojo recorre el estante de izquierda a derecha y así ve más opciones en menos tiempo.</p></div>
+      <div class="card"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 20h18M6 16v-4M12 16V8M18 16V4"/></svg></div><h3>Escalera de precios</h3><p>Dentro de cada categoría, ordena de menor a mayor precio en el sentido del recorrido (bueno → mejor → excelente). El cliente "sube" de precio sin darse cuenta.</p></div>
+      <div class="card"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v12H5.2L4 17.2Z"/></svg></div><h3>Shelf talkers que venden</h3><p>Tarjetas cortas con puntaje, maridaje o "recomendado por el equipo". Una buena nota en el estante puede subir notablemente las ventas de ese producto.</p></div>
+      <div class="card"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Rotación por temporada</h3><p>Cambia cabeceras y el muro de poder cada 4–6 semanas: rosados en verano, tintos robustos y espumosos en fin de año, regalos en fechas especiales.</p></div>
+      <div class="card"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg></div><h3>Frentes según ventas</h3><p>Los productos que más venden merecen más frentes (botellas visibles de cara). Un producto con un solo frente que nunca se agota está ocupando espacio de más.</p></div>
+      <div class="card"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/></svg></div><h3>Cuida el producto y la ley</h3><p>Vino fino lejos de luz directa y calor; botellas acostadas si tienen corcho. Revisa las normas locales de exhibición, venta y verificación de edad para alcohol.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPACE TO SALES -->
+<section id="espacio">
+  <div class="wrap">
+    <div class="eyebrow">4 · Calculadora de espacio</div>
+    <h2>¿Cada categoría tiene el espacio que se gana?</h2>
+    <p class="lede">Escribe qué porcentaje de tus ventas genera cada categoría y cuántos metros lineales de estante ocupa hoy. La calculadora te dice cuánto espacio le corresponde según lo que vende. Los números de ejemplo son ilustrativos: reemplázalos con los tuyos.</p>
+    <div class="card calc">
+      <div class="calc-top">
+        <label>Metros lineales totales<input type="number" id="totalM" min="1" step="0.5" value="60"></label>
+        <label>Peso del margen (0 = solo ventas)<input type="range" id="marginW" min="0" max="50" step="5" value="20"></label>
+        <span id="marginWv" class="note" style="margin:0">20% margen · 80% ventas</span>
+      </div>
+      <table>
+        <thead><tr><th>Categoría</th><th>% ventas</th><th>% margen bruto</th><th>Metros hoy</th><th>Recomendado</th><th>Cambio</th><th style="width:22%">Hoy vs. recomendado</th></tr></thead>
+        <tbody id="calcBody"></tbody>
+        <tfoot><tr><td><b>Total</b></td><td class="num" id="sumSales"></td><td></td><td class="num" id="sumCur"></td><td class="num" id="sumRec"></td><td colspan="2"></td></tr></tfoot>
+      </table>
+      <p class="note">Barra gris = espacio actual · línea de color = espacio recomendado. Se recomienda mover espacio de forma gradual (no más de 20–30% por categoría a la vez) y medir ventas 4–8 semanas después.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DIAGNOSTIC -->
+<section id="diagnostico">
+  <div class="wrap">
+    <div class="eyebrow">5 · Autodiagnóstico</div>
+    <h2>¿Qué tan optimizada está tu tienda?</h2>
+    <p class="lede">Marca lo que ya haces. Tus respuestas se guardan en este navegador para que puedas volver y ver tu avance.</p>
+    <div class="diag">
+      <div class="card" id="diagForm"></div>
+      <div class="card score">
+        <svg class="ring" viewBox="0 0 150 150" aria-hidden="true">
+          <circle class="bg" cx="75" cy="75" r="62"/>
+          <circle class="fg" id="ringFg" cx="75" cy="75" r="62" stroke-dasharray="389.6" stroke-dashoffset="389.6" transform="rotate(-90 75 75)"/>
+          <text x="75" y="86" text-anchor="middle" id="ringTxt">0</text>
+        </svg>
+        <div class="lvlname" id="lvlName">Empecemos</div>
+        <p class="note" style="margin:6px 0 0">Tus 3 prioridades:</p>
+        <ol id="prio"></ol>
+        <button class="btn ghost" id="resetDiag" style="margin-top:12px;font-size:.88rem">Reiniciar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="plan">
+  <div class="wrap">
+    <div class="eyebrow">6 · Plan de acción</div>
+    <h2>Paso a paso según tu situación</h2>
+    <div class="tabs" role="tablist" aria-label="Tipo de cliente">
+      <button role="tab" id="tab-nuevo" aria-selected="true" data-tab="nuevo">Cliente nuevo</button>
+      <button role="tab" id="tab-actual" aria-selected="false" data-tab="actual">Cliente actual</button>
+    </div>
+    <ol class="steps" id="steps" role="tabpanel"></ol>
+  </div>
+</section>
+
+<!-- REQUEST -->
+<section id="solicitar">
+  <div class="wrap">
+    <div class="eyebrow">7 · Siguiente paso</div>
+    <h2>Prepara tu solicitud de asesoría</h2>
+    <p class="lede">Completa los datos de tu tienda. Generamos un resumen (incluye tu puntaje del diagnóstico) que puedes copiar, imprimir o enviar a tu asesor.</p>
+    <form class="card" id="reqForm">
+      <div class="form-grid">
+        <label>Nombre de la tienda<input name="tienda" required></label>
+        <label>Ciudad<input name="ciudad"></label>
+        <label>Tipo de cliente
+          <select name="tipo"><option value="Nuevo (apertura/remodelación)">Nuevo (apertura/remodelación)</option><option value="Actual (optimización)">Actual (optimización)</option></select>
+        </label>
+        <label>Tamaño aproximado (m²)<input name="m2" type="number" min="0"></label>
+        <label>N.º aproximado de productos (SKU)<input name="sku" type="number" min="0"></label>
+        <label>Mayor reto
+          <select name="reto"><option>Poca visibilidad de productos premium</option><option>Tienda desordenada / difícil de recorrer</option><option>Inventario que no rota</option><option>Ticket promedio bajo</option><option>Falta de espacio</option><option>Otro</option></select>
+        </label>
+        <label class="full">Notas adicionales<textarea name="notas" placeholder="Ej.: queremos una sala de vinos finos, tenemos 3 refrigeradores, la entrada está a la izquierda…"></textarea></label>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+        <button class="btn" type="submit">Generar resumen</button>
+        <button class="btn ghost" type="button" id="copyBtn" hidden>Copiar</button>
+        <button class="btn ghost" type="button" id="printBtn" hidden>Imprimir</button>
+      </div>
+      <div class="summary" id="summary" hidden></div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap"><b>Alex Solutions, Inc</b> · Alex Zavala · <a href="/">Licencias de licor</a> · <a href="/contacto">Contacto</a><br>Asesoría de layout y merchandising para Fine Wine &amp; Spirits. © 2026.<br>Guía orientativa de merchandising. Los porcentajes son referencias generales de la industria minorista; los resultados dependen de cada tienda. Verifica siempre la normativa local sobre venta y exhibición de bebidas alcohólicas.</div>
+</footer>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const store = {
+    get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } },
+    set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+  };
+
+  /* theme */
+  const root = document.documentElement;
+  const savedTheme = store.get('cl-theme');
+  if (savedTheme) root.dataset.theme = savedTheme;
+  $('#themeBtn').addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    store.set('cl-theme', root.dataset.theme);
+  });
+
+  /* hero paths */
+  document.querySelectorAll('.path').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.path').forEach(x => x.setAttribute('aria-pressed', x === b));
+    setTab(b.dataset.path);
+    $('#reqForm [name=tipo]').selectedIndex = b.dataset.path === 'nuevo' ? 0 : 1;
+    $(b.dataset.path === 'nuevo' ? '#plano' : '#diagnostico').scrollIntoView();
+  }));
+
+  /* zones */
+  const Z = {
+    1:{t:'Entrada y zona de descompresión', why:'Los primeros 2–3 metros el cliente se está adaptando al espacio y casi no mira productos. Lo que pongas aquí se pierde.', what:['Piso despejado y buena iluminación','Un solo elemento de bienvenida: pizarra con la promoción de la semana','Canastas o carritos a mano'], err:'Llenar la entrada de cajas y exhibidores: el cliente los esquiva y no los ve.'},
+    2:{t:'Muro de poder (a la derecha)', why:'La mayoría de los clientes gira a la derecha al entrar. Es el primer estante que realmente miran.', what:['Novedades y productos de temporada','Promociones de alta rotación','Vinos con alto margen y buena historia'], err:'Usar este muro para inventario lento o producto "de relleno".'},
+    3:{t:'Vinos por país y región', why:'El cliente de vino busca primero por origen (Chile, Argentina, España, Francia, Italia, EE. UU.). Organizar así reduce el tiempo de búsqueda.', what:['Dentro de cada país: tintos → blancos → rosados','Dentro de cada estilo: precio de menor a mayor','Señalización grande con el país arriba del estante'], err:'Mezclar orden por varietal y por país en la misma sección: confunde.'},
+    4:{t:'Sala de vinos finos', why:'Los vinos de alto valor necesitan temperatura controlada y una sensación de exclusividad que justifique el precio.', what:['Botellas acostadas, poca luz directa, 12–16 °C','Madera, iluminación cálida y pocas etiquetas por estante','Fichas con añada, puntaje y maridaje'], err:'Poner vinos de colección junto a la ventana o bajo luz fluorescente fuerte.'},
+    5:{t:'Refrigerados al fondo', why:'Cerveza fría, espumosos y blancos fríos son "productos destino": el cliente va a buscarlos sí o sí. Al fondo, recorre toda la tienda para llegar.', what:['Cerveza, sidras y bebidas listas para tomar','Espumosos y blancos fríos para consumo inmediato','Hielo y mixers cerca'], err:'Poner los refrigeradores junto a la puerta: el cliente compra y se va sin ver nada más.'},
+    6:{t:'Destilados por categoría', why:'En licores el cliente piensa primero en la categoría (whisky, tequila, ron, vodka, gin) y después en la marca.', what:['Una sección por categoría con señalización clara','Escalera de precios: económico a la izquierda, premium a la derecha','Mixers y cristalería al lado (venta cruzada)'], err:'Ordenar por proveedor o distribuidor en lugar de por lo que busca el cliente.'},
+    7:{t:'Góndolas centrales y cabeceras', why:'Las cabeceras (los extremos de cada góndola) se ven desde los pasillos principales y venden varias veces más que el centro del pasillo.', what:['Cabeceras: una sola idea por cabecera ("Vinos para asado", "Top 10 menos de $15")','Góndolas: categorías de volumen y vino de precio medio','Pasillos de al menos 1.2 m para circular cómodo'], err:'Cabeceras saturadas con muchas marcas diferentes y sin mensaje.'},
+    8:{t:'Vitrina premium cerrada', why:'Los destilados de alto valor necesitan seguridad, pero deben seguir visibles. Cerca de la caja el personal puede atenderlos.', what:['Whiskies de malta, cognac, tequilas extra añejo, ediciones limitadas','Iluminación LED dentro de la vitrina','Precio visible: el cliente no pregunta lo que cree que no puede pagar'], err:'Guardarlos en bodega o detrás del mostrador sin exhibir: no se venden.'},
+    9:{t:'Caja y compras de impulso', why:'Mientras esperan, los clientes agregan productos pequeños y baratos. Es la última oportunidad de subir el ticket.', what:['Miniaturas, chocolates, sacacorchos, bolsas de regalo','Vino de la semana a precio especial','Tarjetas de regalo y programa de lealtad'], err:'Dejar la caja vacía o llena de papeles: es espacio de venta perdido.'},
+    10:{t:'Cata, experiencia y regalos', why:'Probar un vino aumenta mucho la probabilidad de compra y crea clientes fieles. Los regalos aumentan el ticket promedio.', what:['Mesa de degustación (si la ley local lo permite)','Estuches, cajas de regalo y kits armados','Calendario de catas y eventos visible'], err:'Una zona de cata sin personal ni producto disponible para comprar al lado.'}
+  };
+  const legend = $('#legend');
+  Object.keys(Z).forEach(k => {
+    const b = document.createElement('button'); b.textContent = k + ' · ' + Z[k].t.split(' (')[0].split(',')[0];
+    b.dataset.z = k; b.addEventListener('click', () => showZone(k)); legend.appendChild(b);
+  });
+  function showZone(k){
+    const z = Z[k];
+    document.querySelectorAll('.zone').forEach(g => g.classList.toggle('active', g.dataset.z === String(k)));
+    legend.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.z === String(k)));
+    $('#zonePanel').innerHTML = `<h3><span class="n">${k}</span>${z.t}</h3>
+      <dl><dt>Por qué</dt><dd>${z.why}</dd>
+      <dt>Qué colocar</dt><dd><ul>${z.what.map(w=>`<li>${w}</li>`).join('')}</ul></dd></dl>
+      <div class="err"><b>Error común:</b> ${z.err}</div>`;
+  }
+  document.querySelectorAll('.zone').forEach(g => {
+    g.addEventListener('click', () => showZone(g.dataset.z));
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showZone(g.dataset.z); } });
+  });
+  showZone(2);
+
+  /* shelf */
+  const L = [
+    {n:'Superior', h:'> 1.6 m', pct:'~15%', d:'Zona de "estirarse". Se ve de lejos, pero cuesta alcanzarla.', items:['Botellas de exhibición y marca','Formatos especiales y estuches','Señalización de la categoría'], c:'var(--gold)', b:[30,36,30,40,30,36]},
+    {n:'Ojos', h:'1.2–1.6 m', pct:'~35%', d:'El nivel que más vende. Es tu espacio más valioso: úsalo para lo que deja más ganancia.', items:['Productos de mayor margen','Recomendaciones del equipo','Marcas que quieres impulsar'], c:'var(--accent)', b:[38,42,38,42,38,42]},
+    {n:'Manos', h:'0.9–1.2 m', pct:'~30%', d:'Fácil de tomar sin esfuerzo. Ideal para lo que el cliente ya conoce y busca.', items:['Los más vendidos','Marcas líderes reconocidas','Precio medio'], c:'#9B4A5E', b:[36,36,40,36,36,40]},
+    {n:'Inferior', h:'< 0.9 m', pct:'~20%', d:'Hay que agacharse. Lo compra quien ya sabe lo que quiere.', items:['Formatos grandes y magnum','Cajas y packs','Productos económicos y de volumen'], c:'var(--muted)', b:[44,44,44,44,44,44]}
+  ];
+  const shelf = $('#shelf');
+  L.forEach((l,i) => {
+    const b = document.createElement('button'); b.className = 'lvl';
+    b.innerHTML = `<div><b>${l.n}</b><br><small>${l.h}</small></div><div class="bottles">${l.b.map(h=>`<i style="height:${h}px;--c:${l.c}"></i>`).join('')}</div>`;
+    b.addEventListener('click', () => showLvl(i)); shelf.appendChild(b);
+  });
+  function showLvl(i){
+    const l = L[i];
+    shelf.querySelectorAll('.lvl').forEach((b,j) => b.classList.toggle('active', i===j));
+    $('#lvlInfo').innerHTML = `<div class="eyebrow">Nivel ${l.n.toLowerCase()} · ${l.h}</div><div class="pct">${l.pct}</div><p class="note" style="margin-top:4px">de las ventas de la sección (referencia aproximada)</p><p>${l.d}</p><ul class="chips">${l.items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  }
+  showLvl(1);
+
+  /* calculator */
+  const defaults = [
+    ['Vino tinto',30,35,14],['Vino blanco y rosado',14,35,8],['Espumosos',8,38,5],['Vinos finos (+$50)',6,42,4],
+    ['Whisky',14,30,8],['Tequila / mezcal',10,30,7],['Vodka / gin',7,28,6],['Ron / otros',5,28,5],['Cerveza y RTD',6,22,3]
+  ];
+  let rows = store.get('cl-calc') || defaults.map(r => ({n:r[0],s:r[1],m:r[2],c:r[3]}));
+  if (store.get('cl-total')) $('#totalM').value = store.get('cl-total');
+  const body = $('#calcBody');
+  function drawCalc(){
+    body.innerHTML = rows.map((r,i) => `<tr data-i="${i}"><td>${r.n}</td>
+      <td><input type="number" min="0" step="0.5" data-f="s" value="${r.s}" aria-label="% ventas ${r.n}"></td>
+      <td><input type="number" min="0" max="100" step="1" data-f="m" value="${r.m}" aria-label="% margen ${r.n}"></td>
+      <td><input type="number" min="0" step="0.5" data-f="c" value="${r.c}" aria-label="Metros actuales ${r.n}"></td>
+      <td class="num rec"></td><td class="num delta"></td><td><div class="bar"><span class="cur"></span><span class="rec"></span></div></td></tr>`).join('');
+    calc();
+  }
+  function calc(){
+    const total = +$('#totalM').value || 0;
+    const w = +$('#marginW').value / 100;
+    $('#marginWv').textContent = `${Math.round(w*100)}% margen · ${Math.round((1-w)*100)}% ventas`;
+    const sumS = rows.reduce((a,r)=>a+(+r.s||0),0);
+    const sumGP = rows.reduce((a,r)=>a+(+r.s||0)*(+r.m||0),0);
+    const sumC = rows.reduce((a,r)=>a+(+r.c||0),0);
+    const recs = rows.map(r => {
+      const sShare = sumS ? (+r.s||0)/sumS : 0;
+      const gShare = sumGP ? (+r.s||0)*(+r.m||0)/sumGP : 0;
+      return total * ((1-w)*sShare + w*gShare);
+    });
+    const max = Math.max(...recs, ...rows.map(r=>+r.c||0), 1);
+    body.querySelectorAll('tr').forEach((tr,i) => {
+      const cur = +rows[i].c||0, rec = recs[i], d = rec - cur;
+      tr.querySelector('.rec').textContent = rec.toFixed(1) + ' m';
+      const dEl = tr.querySelector('.delta');
+      const pct = cur ? Math.round(d/cur*100) : 0;
+      dEl.textContent = Math.abs(d) < 0.25 ? '✓ OK' : (d>0?'+':'') + d.toFixed(1) + ' m' + (cur ? ` (${pct>0?'+':''}${pct}%)` : '');
+      dEl.className = 'num delta ' + (Math.abs(d) < 0.25 ? '' : d>0 ? 'up' : 'down');
+      tr.querySelector('.bar .cur').style.width = (cur/max*100) + '%';
+      tr.querySelector('.bar .rec').style.width = (rec/max*100) + '%';
+    });
+    $('#sumSales').innerHTML = Math.abs(sumS-100) < 0.01 ? '100%' : `<span class="warnmsg">${sumS}%</span>`;
+    $('#sumSales').title = Math.abs(sumS-100) < 0.01 ? '' : 'Los porcentajes no suman 100; se normalizan automáticamente';
+    $('#sumCur').innerHTML = Math.abs(sumC-total) < 0.01 ? sumC + ' m' : `<span class="warnmsg" title="No coincide con el total">${sumC} m</span>`;
+    $('#sumRec').textContent = total.toFixed(1) + ' m';
+    store.set('cl-calc', rows); store.set('cl-total', total);
+  }
+  body.addEventListener('input', e => {
+    const tr = e.target.closest('tr'); if (!tr || !e.target.dataset.f) return;
+    rows[+tr.dataset.i][e.target.dataset.f] = e.target.value; calc();
+  });
+  $('#totalM').addEventListener('input', calc);
+  $('#marginW').addEventListener('input', calc);
+  drawCalc();
+
+  /* diagnostic */
+  const D = [
+    {g:'Recorrido y zonas', items:[
+      ['entrada','La entrada está despejada (sin cajas ni exhibidores en los primeros 2 m)','Despeja los primeros 2–3 m de la entrada.'],
+      ['derecha','El muro a la derecha de la entrada tiene novedades o promociones','Convierte el muro derecho en tu "muro de poder" con novedades.'],
+      ['fondo','Los refrigerados/cerveza están al fondo de la tienda','Mueve los refrigerados al fondo para que recorran la tienda.'],
+      ['pasillos','Los pasillos miden al menos 1.2 m y no tienen obstáculos','Amplía pasillos a 1.2 m mínimo y retira obstáculos.']]},
+    {g:'Organización del producto', items:[
+      ['pais','Los vinos están organizados por país/región con señalización clara','Organiza los vinos por país/región y pon letreros grandes.'],
+      ['categoria','Los destilados están agrupados por categoría (whisky, tequila…)','Agrupa los destilados por categoría, no por proveedor.'],
+      ['escalera','Dentro de cada sección hay escalera de precios (menor → mayor)','Ordena cada sección de menor a mayor precio.'],
+      ['ojos','El nivel de los ojos tiene los productos de mayor margen','Sube los productos de mayor margen al nivel de los ojos.']]},
+    {g:'Visibilidad y venta', items:[
+      ['talkers','Uso shelf talkers con puntajes, maridajes o recomendaciones','Agrega shelf talkers en tus 20 productos clave.'],
+      ['premium','Los productos premium están exhibidos (no guardados) y con precio visible','Exhibe los premium en vitrina iluminada con precio visible.'],
+      ['cabeceras','Cada cabecera tiene un solo mensaje y cambia cada 4–6 semanas','Define un tema por cabecera y un calendario de rotación.'],
+      ['caja','La caja tiene productos de impulso (miniaturas, accesorios)','Aprovecha la caja con miniaturas y accesorios.']]},
+    {g:'Gestión', items:[
+      ['espacio','Reviso que el espacio de cada categoría corresponda a sus ventas','Usa la calculadora de espacio y ajusta cada trimestre.'],
+      ['agotados','Reviso agotados y huecos en el estante al menos una vez por semana','Haz un recorrido semanal de agotados y huecos.'],
+      ['cuidado','El vino fino está lejos de luz directa y calor, acostado si tiene corcho','Protege el vino fino de luz y calor; acuéstalo.']]}
+  ];
+  const all = D.flatMap(g => g.items);
+  let ans = store.get('cl-diag') || {};
+  $('#diagForm').innerHTML = D.map(g => `<fieldset><legend>${g.g}</legend>${g.items.map(([id,txt]) =>
+    `<label class="check"><input type="checkbox" data-id="${id}" ${ans[id]?'checked':''}><span>${txt}</span></label>`).join('')}</fieldset>`).join('');
+  function score(){
+    const done = all.filter(([id]) => ans[id]).length;
+    const pct = Math.round(done/all.length*100);
+    $('#ringFg').style.strokeDashoffset = 389.6 * (1 - pct/100);
+    $('#ringTxt').textContent = pct;
+    $('#lvlName').textContent = pct >= 85 ? 'Tienda optimizada' : pct >= 60 ? 'Buen camino' : pct >= 30 ? 'Con potencial' : 'Gran oportunidad de mejora';
+    const todo = all.filter(([id]) => !ans[id]).slice(0,3);
+    $('#prio').innerHTML = todo.length ? todo.map(t => `<li>${t[2]}</li>`).join('') : '<li>¡Excelente! Mantén la rotación y mide resultados cada mes.</li>';
+    store.set('cl-diag', ans);
+    return {pct, done};
+  }
+  $('#diagForm').addEventListener('change', e => { if (e.target.dataset.id) { ans[e.target.dataset.id] = e.target.checked; score(); } });
+  $('#resetDiag').addEventListener('click', () => { ans = {}; $('#diagForm').querySelectorAll('input').forEach(i => i.checked = false); score(); });
+  score();
+
+  /* roadmap */
+  const R = {
+    nuevo:[
+      {w:'Semana 1–2', t:'Descubrimiento', i:['Perfil del cliente de tu zona y competencia','Medidas del local, entrada, luz y tomas eléctricas','Presupuesto y metas de ventas']},
+      {w:'Semana 3–4', t:'Diseño del layout', i:['Plano con zonas y recorrido','Mobiliario: estantes, refrigeradores, vitrina premium','Plan de iluminación y señalización']},
+      {w:'Semana 5–6', t:'Surtido y planograma', i:['Mezcla de categorías y escalera de precios','Asignación de espacio por categoría','Planograma estante por estante']},
+      {w:'Apertura +30 días', t:'Lanzamiento y ajuste', i:['Montaje y capacitación del equipo','Medir ventas por zona las primeras semanas','Primer ajuste de espacio y cabeceras']}
+    ],
+    actual:[
+      {w:'Semana 1', t:'Diagnóstico', i:['Autodiagnóstico de esta página','Reporte de ventas y margen por categoría','Fotos de cada sección y recorrido actual']},
+      {w:'Semana 2', t:'Victorias rápidas', i:['Despejar entrada y activar muro de poder','Shelf talkers en productos clave','Subir alto margen al nivel de los ojos']},
+      {w:'Semana 3–6', t:'Reorganización', i:['Reasignar espacio con la calculadora','Reordenar vinos por país y destilados por categoría','Crear o mejorar la vitrina premium']},
+      {w:'Mes 2–3', t:'Medir y mantener', i:['Comparar ventas antes vs. después','Calendario de rotación de cabeceras','Revisión trimestral de espacio y surtido']}
+    ]
+  };
+  function setTab(k){
+    document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === k));
+    $('#steps').setAttribute('aria-labelledby', 'tab-' + k);
+    $('#steps').innerHTML = R[k].map(s => `<li class="card"><div class="when">${s.w}</div><h3>${s.t}</h3><ul>${s.i.map(x=>`<li>${x}</li>`).join('')}</ul></li>`).join('');
+  }
+  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  setTab('nuevo');
+
+  /* request form */
+  $('#reqForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    const s = score();
+    const prios = [...$('#prio').querySelectorAll('li')].map(li => '  • ' + li.textContent).join('\n');
+    const txt = `SOLICITUD DE ASESORÍA · LAYOUT FINE WINE & SPIRITS
+Tienda: ${f.tienda}${f.ciudad ? ' — ' + f.ciudad : ''}
+Tipo de cliente: ${f.tipo}
+Tamaño: ${f.m2 ? f.m2 + ' m²' : 'no indicado'} · Productos: ${f.sku || 'no indicado'} SKU
+Mayor reto: ${f.reto}
+Puntaje de autodiagnóstico: ${s.pct}/100 (${s.done} de ${all.length} prácticas)
+Prioridades sugeridas:
+${prios}
+${f.notas ? 'Notas: ' + f.notas : ''}`.trim();
+    const box = $('#summary'); box.textContent = txt; box.hidden = false;
+    $('#copyBtn').hidden = false; $('#printBtn').hidden = false;
+  });
+  $('#copyBtn').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText($('#summary').textContent); $('#copyBtn').textContent = 'Copiado ✓'; }
+    catch(e){ $('#copyBtn').textContent = 'Selecciona y copia manualmente'; }
+    setTimeout(() => $('#copyBtn').textContent = 'Copiar', 2000);
+  });
+  $('#printBtn').addEventListener('click', () => print());
+})();
+</script>
+</body>
+</html>

@@ -94,6 +94,44 @@ app.get("/api/public-stats", (req, res) => {
   res.json({ ready: true, totalLicenses: s.totalLicenses, foodBusinesses: s.foodBusinesses, prospects: s.prospects, tierA: ds.prospects.filter((p) => p.tier === "A" && !p.chain).length, updatedAt: ds.updatedAt });
 });
 
+// ---------- Tarjeta de contacto (datos desde variables de entorno) ----------
+function contactInfo(req) {
+  const e = process.env;
+  return {
+    name: e.CONTACT_NAME || "Alex Zavala",
+    title: e.CONTACT_TITLE || "Licencias de licor y layout para restaurantes y tiendas de vinos y licores",
+    company: e.CONTACT_COMPANY || "Alex Solutions, Inc",
+    phone: e.CONTACT_PHONE || "",
+    whatsapp: (e.CONTACT_WHATSAPP || "").replace(/[^\d]/g, ""),
+    email: e.CONTACT_EMAIL || "",
+    city: e.CONTACT_CITY || "Chicago, IL",
+    website: e.CONTACT_WEBSITE || `${req.protocol}://${req.get("host")}`,
+    instagram: e.CONTACT_INSTAGRAM || "",
+    linkedin: e.CONTACT_LINKEDIN || "",
+  };
+}
+const vcEsc = (s = "") => String(s).replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/([,;])/g, "\\$1");
+function vcard(c) {
+  const [first, ...rest] = c.name.split(" ");
+  return [
+    "BEGIN:VCARD", "VERSION:3.0",
+    `N:${vcEsc(rest.join(" "))};${vcEsc(first)};;;`, `FN:${vcEsc(c.name)}`,
+    `ORG:${vcEsc(c.company)}`, `TITLE:${vcEsc(c.title)}`,
+    c.phone && `TEL;TYPE=CELL:${c.phone}`,
+    c.email && `EMAIL;TYPE=INTERNET:${c.email}`,
+    c.city && `ADR;TYPE=WORK:;;;${vcEsc(c.city)};;;`,
+    c.website && `URL:${c.website}`,
+    "END:VCARD",
+  ].filter(Boolean).join("\r\n");
+}
+app.get("/api/contact", (req, res) => { const c = contactInfo(req); res.json({ ...c, vcard: vcard(c) }); });
+app.get("/contacto.vcf", (req, res) => {
+  const c = contactInfo(req);
+  res.setHeader("Content-Type", "text/vcard; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="${c.name.replace(/[^\w ]/g, "").replace(/ /g, "-") || "contacto"}.vcf"`);
+  res.send(vcard(c));
+});
+
 app.get("/login", (req, res) => {
   if (readToken(req)) return res.redirect("/app");
   res.sendFile(path.join(__dirname, "views", "login.html"));

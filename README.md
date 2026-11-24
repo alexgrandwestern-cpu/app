@@ -12,6 +12,11 @@
 - **Copiloto IA**: con `ANTHROPIC_API_KEY` usa Claude con herramientas sobre los datos reales; sin clave, responde con un motor local.
 - **Landing page** de marketing y **login** protegido.
 
+## Alex Solutions, Inc: otros servicios
+
+- **`/asesoria-layout`**: guía interactiva de layout para tiendas de Fine Wine & Spirits (plano de 10 zonas, estantería por niveles, calculadora de espacio vs. ventas, autodiagnóstico, plan de acción y solicitud de asesoría). Viene de la sesión anterior (`vinos-licores.html`).
+- **`/contacto`**: tarjeta de contacto con botones de llamar, WhatsApp y correo, QR al enlace, QR vCard y descarga `.vcf` (`/contacto.vcf`). Los datos se configuran con variables de entorno.
+
 ## Variables de entorno
 
 | Variable | Descripción |
@@ -21,6 +26,9 @@
 | `SESSION_SECRET` | Secreto para firmar la sesión |
 | `ANTHROPIC_API_KEY` | (Opcional) activa el asistente con Claude |
 | `REFRESH_HOURS` | Cada cuántas horas se vuelven a descargar los datos (24) |
+| `CONTACT_NAME`, `CONTACT_TITLE`, `CONTACT_COMPANY` | Tarjeta de contacto (por defecto Alex Zavala · Alex Solutions, Inc) |
+| `CONTACT_PHONE`, `CONTACT_WHATSAPP`, `CONTACT_EMAIL` | Teléfono, WhatsApp (solo dígitos con código de país) y correo |
+| `CONTACT_CITY`, `CONTACT_WEBSITE`, `CONTACT_INSTAGRAM`, `CONTACT_LINKEDIN` | Opcionales |
 
 ## Correr localmente
 

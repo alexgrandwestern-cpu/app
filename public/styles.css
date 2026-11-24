@@ -111,3 +111,6 @@ footer.site .container { display: flex; justify-content: space-between; gap: 16p
 .field input:focus { outline: 2px solid color-mix(in srgb, var(--brand) 40%, transparent); border-color: var(--brand); }
 .alert { padding: 10px 14px; border-radius: 10px; background: #fde8e8; color: #8b1c1c; font-size: 14px; margin-bottom: 16px; }
 @media (max-width: 860px) { .auth { grid-template-columns: 1fr; } .auth-art { display: none; } }
+.feats { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.feats h3 { font: 700 17px var(--font); margin: 0 0 2px; }
+.feats p { margin: 0; color: var(--muted); }

@@ -164,12 +164,19 @@ function renderPipeline() {
 }
 
 // ---------- Ficha ----------
+function layoutPitch(p) {
+  if (p.segment === "Tienda / Grocery") return "Con Package Goods: plano de tienda, muro de poder, refrigerados al fondo y escalera de precios para vinos y licores.";
+  if (p.segment === "Restaurante con comedor") return "Diseño de barra y contrabarra, carta de bebidas visible y exhibición de botellas premium.";
+  if (p.segment === "Café y bebidas") return "Exhibición de vino y cerveza artesanal junto al mostrador y menú de maridajes.";
+  return "Exhibición de botellas, refrigeradores y compras de impulso en caja.";
+}
 function callScript(p) {
   return `Hola, ¿hablo con el dueño o gerente de ${p.name}?
 Mi nombre es Alex Zavala. Ayudo a restaurantes aquí en ${p.area} a obtener su licencia de licor con la Ciudad de Chicago.
 Vi que ${p.name} todavía no tiene licencia para servir alcohol${p.licenses.includes("Outdoor Patio") ? ", y que ya tienen patio exterior — es la combinación perfecta" : ""}.
 Muchos negocios de ${p.cuisine !== "Otra / Sin identificar" ? "cocina " + p.cuisine.toLowerCase() : "comida"} aumentan su ticket promedio al ofrecer cerveza, vino o cocteles.
 Yo me encargo de todo el trámite (${p.recommended}): documentos, zonificación, seguro, BASSET e inspecciones.
+Y con Alex Solutions también le ayudo a acomodar ${p.segment === "Tienda / Grocery" ? "la tienda" : "la barra"} para que las bebidas se vendan solas.
 ¿Le parece si paso esta semana 15 minutos para hacerle un diagnóstico gratis?`;
 }
 async function openProspect(id) {
@@ -190,7 +197,10 @@ async function openProspect(id) {
         <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://www.yelp.com/search?find_desc=${encodeURIComponent(p.name)}&find_loc=${qAddr}">⭐ Yelp</a>
       </div>
       <div class="d-section"><h4>¿Por qué es buen prospecto?</h4><ul class="reasons">${p.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></div>
-      <div class="d-section"><h4>Licencia recomendada</h4><div><b>${esc(p.recommended)}</b></div></div>
+      <div class="d-section"><h4>Servicios para ofrecer</h4>
+        <div class="svc"><b>1 · Licencia de licor</b><span>${esc(p.recommended)}</span></div>
+        <div class="svc"><b>2 · Layout y merchandising</b><span>${esc(layoutPitch(p))}</span> <a href="/asesoria-layout" target="_blank" rel="noopener">Ver guía →</a></div>
+      </div>
       <div class="d-section"><h4>Datos de la ciudad</h4><dl class="kv">
         <dt>Razón social</dt><dd>${esc(p.legal)}</dd>
         <dt>Licencias actuales</dt><dd>${p.licenses.map(esc).join(", ")}</dd>
@@ -247,7 +257,7 @@ function refreshAll() {
 // ---------- Asistente ----------
 const chat = [];
 function md(text) {
-  let h = esc(text).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|[^*])\*(?!\s)(.+?)\*/g, "$1<i>$2</i>").replace(/_(.+?)_/g, "<i>$1</i>").replace(/`(.+?)`/g, "<code>$1</code>");
+  let h = esc(text).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|[^*])\*(?!\s)(.+?)\*/g, "$1<i>$2</i>").replace(/_(.+?)_/g, "<i>$1</i>").replace(/`(.+?)`/g, "<code>$1</code>").replace(/\[([^\]]+)\]\((\/[\w\-\/#]*)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
   const lines = h.split("\n"); let out = "", list = null;
   for (const l of lines) {
     const ol = l.match(/^\s*\d+\.\s+(.*)/), ul = l.match(/^\s*[-•]\s+(.*)/);

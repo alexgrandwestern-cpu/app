@@ -121,3 +121,5 @@ input[type=range] { accent-color: var(--brand); width: 100%; }
   .topbar { gap: 10px; padding: 0 12px; }
   .ai-fab span { display: none; }
 }
+.svc { padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
+.svc b { display: block; } .svc span { color: var(--muted); }

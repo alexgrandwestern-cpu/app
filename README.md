@@ -17,6 +17,17 @@
 - **`/asesoria-layout`**: guía interactiva de layout para tiendas de Fine Wine & Spirits (plano de 10 zonas, estantería por niveles, calculadora de espacio vs. ventas, autodiagnóstico, plan de acción y solicitud de asesoría). Viene de la sesión anterior (`vinos-licores.html`).
 - **`/contacto`**: tarjeta de contacto con botones de llamar, WhatsApp y correo, QR al enlace, QR vCard y descarga `.vcf` (`/contacto.vcf`). Los datos se configuran con variables de entorno.
 
+## Marketplace de expertos (modelo tipo Airbnb)
+
+- **`/expertos`**: búsqueda por servicio, zona y palabra clave, con tarjetas, calificación y "Experto destacado".
+- **`/experto/:slug`**: perfil con servicios, reseñas verificadas y tarjeta de reserva.
+- **`/reserva/:token`**: enlace privado del cliente. Muestra el estado (solicitada, aceptada, completada), permite cancelar y dejar una reseña al terminar.
+- **`/unete`**: alta de nuevos expertos. Entra como *pendiente* hasta que Alex lo aprueba.
+- **`/experto-panel/:token`**: enlace privado del experto. Aceptar (con precio final), rechazar, completar, ver ganancias netas y editar perfil y servicios.
+- **Panel de Alex → pestaña Marketplace**: aprobar, pausar o destacar expertos, ver reservas, GMV y comisión. Cada prospecto tiene "Invitar a reservar".
+- **Comisión**: `PLATFORM_FEE_PCT` (15% por defecto) sobre servicios completados. Todavía no hay cobro en línea.
+- **Datos**: Postgres vía `DATABASE_URL` (tabla `docs`).
+
 ## Variables de entorno
 
 | Variable | Descripción |

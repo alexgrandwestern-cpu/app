@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abrir en el teléfono — Alex Solutions</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body { background: radial-gradient(1200px 600px at 50% -10%, #5a1220 0%, #2a0711 50%, #0b0205 100%); color: #fff; min-height: 100vh; }
+    .wrap { width: min(1100px, 100% - 32px); margin: 0 auto; padding: 36px 0 60px; text-align: center; }
+    h1 { font-size: clamp(28px, 4vw, 44px); margin-bottom: 6px; }
+    .sub { color: rgba(255,255,255,.8); margin: 0 0 30px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    @media (max-width: 960px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+    .q { background: #fff; color: #1d1a16; border-radius: 22px; padding: 20px; }
+    .q.main { outline: 4px solid #f2cf85; }
+    .q h2 { font: 700 18px var(--font); margin: 0 0 2px; }
+    .q p { margin: 0 0 10px; color: #6b6359; font-size: 13px; }
+    .q img { width: 100%; max-width: 220px; height: auto; image-rendering: pixelated; margin: 0 auto; }
+    .q a { display: block; margin-top: 8px; font-size: 12px; color: #7a1f2b; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a href="/" class="logo" style="color:#fff;justify-content:center;margin-bottom:18px"><span class="logo-mark">🍷</span> Alex Solutions, Inc</a>
+    <h1>Escanea con la cámara de tu teléfono</h1>
+    <p class="sub">Apunta la cámara al código y toca el enlace que aparece.</p>
+    <div class="grid" id="grid"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script>
+    const items = [
+      ["/app", "Mi panel", "Prospectos, marketplace, distribuidores y asistente (pide usuario y contraseña)", true],
+      ["/", "Página principal", "La página pública de LicenciaPro"],
+      ["/expertos", "Marketplace", "Buscar y reservar expertos"],
+      ["/contacto", "Mi tarjeta", "Tarjeta de contacto para compartir"],
+    ];
+    document.getElementById("grid").innerHTML = items.map(([p, t, d, main]) => {
+      const url = location.origin + p;
+      const q = qrcode(0, "M"); q.addData(url); q.make();
+      return `<div class="q${main ? " main" : ""}"><h2>${t}</h2><p>${d}</p>${q.createImgTag(8, 8, t)}<a href="${p}">${url.replace(/^https?:\/\//, "")}</a></div>`;
+    }).join("");
+  </script>
+</body>
+</html>

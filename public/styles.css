@@ -114,3 +114,6 @@ footer.site .container { display: flex; justify-content: space-between; gap: 16p
 .feats { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
 .feats h3 { font: 700 17px var(--font); margin: 0 0 2px; }
 .feats p { margin: 0; color: var(--muted); }
+.nav-links a { white-space: nowrap; }
+@media (max-width: 1060px) { .nav-links { gap: 16px; } .nav-links a[href="#como"], .nav-links a[href="#plataforma"] { display: none; } }
+@media (max-width: 900px) { .logo > span:last-child { display: none; } }

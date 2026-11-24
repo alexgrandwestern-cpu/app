@@ -6,6 +6,7 @@ import { loadFromCity, loadFromCache } from "./lib/data.js";
 import { filterProspects, stats, facets, toCSV } from "./lib/query.js";
 import { ask, aiEnabled } from "./lib/assistant.js";
 import { marketplaceRouter } from "./lib/marketplace.js";
+import { distributorsRouter } from "./lib/distributors.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -202,6 +203,7 @@ api.post("/refresh", (req, res) => {
   res.json({ ok: true, status });
 });
 app.use("/api/mk", marketplaceRouter(requireAuth));
+app.use("/api/dist", distributorsRouter(requireAuth));
 app.use("/api", api);
 
 // Páginas del marketplace con parámetros en la URL

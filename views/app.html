@@ -56,6 +56,7 @@
         <button class="tab" data-tab="map">Mapa</button>
         <button class="tab" data-tab="pipeline">Pipeline <span class="count" id="count-pipe"></span></button>
         <button class="tab" data-tab="market">Marketplace <span class="count" id="count-mk"></span></button>
+        <button class="tab" data-tab="dist">Distribuidores</button>
       </nav>
 
       <div id="loading" class="loading-card">
@@ -92,6 +93,17 @@
       <section class="tabpane" id="tab-pipeline">
         <p class="muted">Tu pipeline se guarda en este navegador. Cambia el estado desde la ficha de cada prospecto.</p>
         <div class="kanban" id="kanban"></div>
+      </section>
+
+      <section class="tabpane" id="tab-dist">
+        <div class="card">
+          <h3>¿Quién distribuye esta bebida en Illinois?</h3>
+          <p class="muted small" style="margin:-8px 0 12px">Escribe cualquier marca: vino, tequila, cerveza, whisky… Primero se busca en tu directorio; si no está, la IA la investiga en internet con fuentes y la deja <b>sin verificar</b> hasta que tú la confirmes.</p>
+          <form id="dist-form" class="dist-search"><input id="dist-q" placeholder="Ej.: Don Julio, Modelo Especial, Josh Cellars, Tito's…" autocomplete="off" /><button class="btn btn-primary">Buscar</button></form>
+          <div id="dist-status" class="muted small" style="margin-top:8px"></div>
+        </div>
+        <div id="dist-results"></div>
+        <div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">Directorio de marcas</h3><button class="btn btn-ghost btn-sm" id="dist-add">+ Agregar manualmente</button></div><div id="dist-all"></div></div>
       </section>
 
       <section class="tabpane" id="tab-market">

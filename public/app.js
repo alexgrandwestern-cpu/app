@@ -15,7 +15,7 @@ async function api(path, opts) {
   const r = await fetch(path, opts);
   if (r.status === 401) { location.href = "/login"; throw new Error("auth"); }
   if (r.status === 503) { const d = await r.json(); throw Object.assign(new Error("loading"), { status: d.status }); }
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || `HTTP ${r.status}`); }
   return r.json();
 }
 
@@ -196,6 +196,103 @@ async function loadMarket() {
     || `<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">Aún no hay reservas. Comparte tu perfil con prospectos desde su ficha (botón "Invitar a reservar").</td></tr>`;
 }
 
+// ---------- Distribuidores ----------
+let distMeta = null;
+const jpost = (url, method, body) => api(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+function distCard(e, editable = true) {
+  const ok = e.status === "verified";
+  const conf = { alta: "🟢 alta", media: "🟡 media", baja: "🔴 baja" }[e.confidence] || "";
+  return `<div class="card dist-card" data-id="${esc(e.id)}">
+    <div class="list-head" style="margin:0"><h3 style="margin:0">${esc(e.brand)} <span class="muted small">· ${esc(e.category)}</span></h3>
+      <span class="status ${ok ? "st-cliente" : "st-interesado"}">${ok ? "✅ Verificado" : "⚠️ Sin verificar"}</span></div>
+    <dl class="kv" style="margin-top:12px">
+      <dt>Distribuidor(es) en IL</dt><dd>${e.distributors.length ? e.distributors.map((d) => `<b>${esc(d.name)}</b>${d.territory ? ` · ${esc(d.territory)}` : ""}${d.notes ? `<br><span class="muted small">${esc(d.notes)}</span>` : ""}`).join("<br>") : '<span class="muted">No identificado</span>'}</dd>
+      <dt>Proveedor / dueño</dt><dd>${esc(e.supplier || "—")}</dd>
+      ${e.summary ? `<dt>Resumen</dt><dd>${esc(e.summary)}</dd>` : ""}
+      ${e.source === "ia" ? `<dt>Confianza IA</dt><dd>${conf} · investigado ${new Date(e.researchedAt).toLocaleDateString("es-MX")}</dd>` : ""}
+      ${e.sources.length ? `<dt>Fuentes</dt><dd>${e.sources.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title || s.url)}</a>`).join("<br>")}</dd>` : ""}
+      ${e.notes ? `<dt>Mis notas</dt><dd>${esc(e.notes)}</dd>` : ""}
+    </dl>
+    ${editable ? `<div class="actions" style="margin-top:12px">
+      ${ok ? `<button class="btn btn-ghost btn-sm" data-d="unverify">Quitar verificación</button>` : `<button class="btn btn-primary btn-sm" data-d="verify">✅ Confirmar como verificado</button>`}
+      <button class="btn btn-ghost btn-sm" data-d="edit">✏️ Editar</button>
+      ${distMeta?.ai ? `<button class="btn btn-ghost btn-sm" data-d="reresearch">🔄 Investigar de nuevo</button>` : ""}
+      <button class="btn btn-ghost btn-sm" data-d="delete">Eliminar</button></div>` : ""}
+  </div>`;
+}
+function distEditForm(e = {}) {
+  const cats = distMeta?.categories || [];
+  const ds = e.distributors?.length ? e.distributors : [{}];
+  return `<div class="card"><h3>${e.id ? "Editar" : "Agregar"} marca</h3><form id="dist-edit">
+    <div class="frow"><div class="fgroup"><label>Marca</label><input name="brand" value="${esc(e.brand || "")}" required class="inp"></div>
+    <div class="fgroup"><label>Categoría</label><select name="category">${cats.map((c) => `<option ${c === e.category ? "selected" : ""}>${esc(c)}</option>`).join("")}</select></div></div>
+    <div class="fgroup"><label>Proveedor / dueño de la marca</label><input name="supplier" value="${esc(e.supplier || "")}" class="inp"></div>
+    <div class="fgroup"><label>Distribuidores (uno por línea: nombre | territorio)</label><textarea name="dists" rows="3" class="inp">${esc(ds.filter((d) => d.name).map((d) => `${d.name}${d.territory ? " | " + d.territory : ""}`).join("\n"))}</textarea></div>
+    <div class="fgroup"><label>Mis notas (contacto del distribuidor, representante, etc.)</label><textarea name="notes" rows="2" class="inp">${esc(e.notes || "")}</textarea></div>
+    <label class="check"><input type="checkbox" name="verify" ${e.status === "verified" || !e.id ? "checked" : ""}> Marcar como verificado</label>
+    <div class="actions" style="margin-top:10px"><button class="btn btn-primary btn-sm">Guardar</button><button type="button" class="btn btn-ghost btn-sm" id="dist-cancel">Cancelar</button></div>
+  </form></div>`;
+}
+function bindDistCards(root, onChange) {
+  $$(".dist-card [data-d]", root).forEach((b) => b.addEventListener("click", async () => {
+    const card = b.closest(".dist-card"), id = card.dataset.id, a = b.dataset.d;
+    try {
+      if (a === "verify" || a === "unverify") await jpost(`/api/dist/entry/${id}`, "PUT", { verify: a === "verify" });
+      else if (a === "delete") { if (!confirm("¿Eliminar esta marca del directorio?")) return; await api(`/api/dist/entry/${id}`, { method: "DELETE" }); }
+      else if (a === "reresearch") { const brand = card.querySelector("h3").firstChild.textContent.trim(); $("#dist-status").textContent = "Investigando…"; await jpost("/api/dist/research", "POST", { brand, force: true }); $("#dist-status").textContent = ""; }
+      else if (a === "edit") { const all = await api("/api/dist/list"); openDistEdit(all.find((x) => x.id === id)); return; }
+      onChange();
+    } catch (err) { alert(err.message); }
+  }));
+}
+function openDistEdit(e) {
+  $("#dist-results").innerHTML = distEditForm(e || {});
+  $("#dist-results").scrollIntoView({ behavior: "smooth" });
+  $("#dist-cancel").addEventListener("click", () => ($("#dist-results").innerHTML = ""));
+  $("#dist-edit").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const f = ev.target;
+    const body = { brand: f.brand.value, category: f.category.value, supplier: f.supplier.value, notes: f.notes.value, verify: f.verify.checked,
+      distributors: f.dists.value.split("\n").map((l) => l.split("|").map((x) => x.trim())).filter((x) => x[0]).map(([name, territory = ""]) => ({ name, territory, notes: "" })) };
+    try {
+      if (e?.id) await jpost(`/api/dist/entry/${e.id}`, "PUT", body); else await jpost("/api/dist/entry", "POST", body);
+      $("#dist-results").innerHTML = ""; loadDist();
+    } catch (err) { alert(err.message); }
+  });
+}
+async function loadDist() {
+  if (!distMeta) {
+    distMeta = await api("/api/dist/meta");
+    $("#dist-form").addEventListener("submit", searchDist);
+    $("#dist-add").addEventListener("click", () => openDistEdit({ brand: $("#dist-q").value.trim() }));
+  }
+  if (!distMeta.ai) $("#dist-status").innerHTML = "ℹ️ La investigación con IA se activa al agregar <b>ANTHROPIC_API_KEY</b> en Render. Mientras, busca en tu directorio o agrega marcas manualmente.";
+  const all = await api("/api/dist/list");
+  $("#dist-all").innerHTML = all.length ? `<div class="table-wrap"><table class="tbl hover"><thead><tr><th>Marca</th><th>Categoría</th><th>Distribuidor(es)</th><th>Estado</th></tr></thead><tbody>${all.map((e) => `<tr data-id="${esc(e.id)}"><td><b>${esc(e.brand)}</b></td><td>${esc(e.category)}</td><td>${esc(e.distributors.map((d) => d.name).join(", ") || "—")}</td><td>${e.status === "verified" ? "✅" : "⚠️"}</td></tr>`).join("")}</tbody></table></div>` : '<p class="muted">Aún no hay marcas. Busca una arriba para empezar.</p>';
+  $$("#dist-all tr[data-id]").forEach((tr) => tr.addEventListener("click", () => { const e = all.find((x) => x.id === tr.dataset.id); $("#dist-results").innerHTML = distCard(e); bindDistCards($("#dist-results"), loadDist); $("#dist-results").scrollIntoView({ behavior: "smooth" }); }));
+}
+async function searchDist(ev) {
+  ev.preventDefault();
+  const q = $("#dist-q").value.trim();
+  if (q.length < 2) return;
+  const out = $("#dist-results");
+  const local = await api(`/api/dist/list?q=${encodeURIComponent(q)}`);
+  if (local.length) {
+    out.innerHTML = local.slice(0, 5).map((e) => distCard(e)).join("") + (distMeta.ai ? `<p class="muted small">¿No es lo que buscabas? <button class="link" id="dist-force">Investigar "${esc(q)}" con IA</button></p>` : "");
+    bindDistCards(out, loadDist);
+    $("#dist-force")?.addEventListener("click", () => runResearch(q));
+    return;
+  }
+  if (!distMeta.ai) { out.innerHTML = `<div class="card"><p style="margin:0">"${esc(q)}" no está en tu directorio.</p><button class="btn btn-primary btn-sm" style="margin-top:10px" id="dist-man">+ Agregarla manualmente</button></div>`; $("#dist-man").addEventListener("click", () => openDistEdit({ brand: q })); return; }
+  runResearch(q);
+}
+async function runResearch(q) {
+  const out = $("#dist-results");
+  out.innerHTML = `<div class="loading-card show"><div class="spinner"></div><div><b>Investigando "${esc(q)}" en internet…</b><div class="muted">Buscando proveedor y distribuidor actual en Illinois. Puede tardar 20–60 segundos.</div></div></div>`;
+  try { const e = await jpost("/api/dist/research", "POST", { brand: q }); out.innerHTML = distCard(e); bindDistCards(out, loadDist); loadDist(); }
+  catch (err) { out.innerHTML = `<div class="card"><p style="margin:0">${esc(err.message)}</p></div>`; }
+}
+
 // ---------- Ficha ----------
 function inviteLink(p) {
   const q = new URLSearchParams({ negocio: p.name, direccion: `${p.address}, Chicago ${p.zip}`, p: p.id });
@@ -289,7 +386,7 @@ $$(".tab").forEach((t) => t.addEventListener("click", () => {
   refreshTab();
 }));
 function refreshTab() {
-  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket }[state.tab];
+  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: loadDist }[state.tab];
   run().catch((e) => console.error(e));
 }
 function refreshAll() {

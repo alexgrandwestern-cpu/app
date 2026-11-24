@@ -1,0 +1,19 @@
+{
+  "name": "licenciapro-chicago",
+  "version": "1.0.0",
+  "description": "LicenciaPro Chicago — plataforma de Alex Zavala para encontrar restaurantes que necesitan licencia de licor, usando datos abiertos de la Ciudad de Chicago.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "author": "Alex Zavala",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@anthropic-ai/sdk": "latest",
+    "express": "^4.21.2"
+  }
+}

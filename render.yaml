@@ -1,0 +1,22 @@
+# Render Blueprint — LicenciaPro Chicago (Alex Zavala)
+services:
+  - type: web
+    name: licenciapro-chicago
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ADMIN_USER
+        value: alex
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: REFRESH_HOURS
+        value: "24"

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel — LicenciaPro Chicago</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body class="dash">
+  <header class="topbar">
+    <a href="/" class="logo"><span class="logo-mark">🍷</span><span class="hide-sm">LicenciaPro</span></a>
+    <div class="search"><input id="q" type="search" placeholder="Buscar nombre, dirección, barrio, ZIP…" aria-label="Buscar" /></div>
+    <div class="top-actions">
+      <span class="pill" id="data-status" title="Estado de los datos">Cargando…</span>
+      <button class="btn btn-ghost btn-sm hide-sm" id="btn-refresh" title="Volver a descargar datos de la ciudad">↻ Actualizar</button>
+      <button class="btn btn-ghost btn-sm filters-toggle" id="btn-filters">☰ Filtros</button>
+      <form method="post" action="/logout"><button class="btn btn-ghost btn-sm">Salir</button></form>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="filters" id="filters">
+      <div class="filters-head"><h3>Filtros</h3><button class="link" id="btn-clear">Limpiar</button></div>
+      <div class="fgroup"><label>Prioridad</label>
+        <div class="chips" id="f-tier">
+          <button data-v="A" class="chip"><span class="tier tier-A">A</span> Alta</button>
+          <button data-v="B" class="chip"><span class="tier tier-B">B</span> Media</button>
+          <button data-v="C" class="chip"><span class="tier tier-C">C</span> Baja</button>
+        </div>
+      </div>
+      <div class="fgroup"><label for="f-segment">Segmento</label><select id="f-segment"><option value="">Todos</option></select></div>
+      <div class="fgroup"><label for="f-cuisine">Tipo de cocina</label><select id="f-cuisine"><option value="">Todas</option></select></div>
+      <div class="fgroup"><label for="f-area">Área comunitaria</label><select id="f-area"><option value="">Todas</option></select></div>
+      <div class="frow">
+        <div class="fgroup"><label for="f-zip">ZIP</label><select id="f-zip"><option value="">Todos</option></select></div>
+        <div class="fgroup"><label for="f-ward">Ward</label><select id="f-ward"><option value="">Todos</option></select></div>
+      </div>
+      <div class="fgroup"><label for="f-min">Puntaje mínimo: <b id="f-min-v">0</b></label><input type="range" id="f-min" min="0" max="100" step="5" value="0" /></div>
+      <label class="check"><input type="checkbox" id="f-new" /> Solo negocios nuevos (≤ 24 meses)</label>
+      <label class="check"><input type="checkbox" id="f-patio" /> Con patio exterior</label>
+      <label class="check"><input type="checkbox" id="f-excl" /> Incluir cadenas e instituciones</label>
+      <a class="btn btn-primary btn-sm" id="btn-export" style="margin-top:14px;justify-content:center">⬇ Exportar CSV</a>
+      <p class="fnote">Prospecto = negocio con licencia <i>Retail Food Establishment</i> sin licencia de licor en su ubicación.</p>
+    </aside>
+
+    <main class="main">
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="overview">Resumen</button>
+        <button class="tab" data-tab="list">Prospectos <span class="count" id="count-list"></span></button>
+        <button class="tab" data-tab="map">Mapa</button>
+        <button class="tab" data-tab="pipeline">Pipeline <span class="count" id="count-pipe"></span></button>
+      </nav>
+
+      <div id="loading" class="loading-card">
+        <div class="spinner"></div>
+        <div><b>Analizando la base de datos de Chicago…</b><div id="loading-msg" class="muted">Descargando licencias activas</div></div>
+      </div>
+
+      <section class="tabpane active" id="tab-overview">
+        <div class="kpis" id="kpis"></div>
+        <div class="cards-2">
+          <div class="card"><h3>Prospectos por segmento</h3><div id="ch-segment" class="bars"></div></div>
+          <div class="card"><h3>Por tipo de cocina</h3><div id="ch-cuisine" class="bars"></div></div>
+        </div>
+        <div class="card"><h3>Mejores zonas <span class="muted small">(clic para filtrar)</span></h3>
+          <div class="table-wrap"><table class="tbl" id="tbl-areas"><thead><tr><th>Área comunitaria</th><th class="num">Prospectos</th><th class="num">Nivel A</th><th class="num">Puntaje prom.</th><th></th></tr></thead><tbody></tbody></table></div>
+        </div>
+        <div class="card"><h3>Top 10 prospectos ahora</h3><div id="top10" class="toplist"></div></div>
+      </section>
+
+      <section class="tabpane" id="tab-list">
+        <div class="list-head">
+          <span class="muted" id="list-summary"></span>
+          <label class="muted small">Ordenar: <select id="sort"><option value="score">Puntaje</option><option value="new">Más recientes</option><option value="name">Nombre</option><option value="area">Área</option></select></label>
+        </div>
+        <div class="table-wrap card flush"><table class="tbl hover" id="tbl-list"><thead><tr><th></th><th>Negocio</th><th class="hide-sm">Área</th><th class="hide-md">Segmento</th><th class="hide-md">Cocina</th><th class="num">Puntaje</th><th class="hide-sm">Estado</th></tr></thead><tbody></tbody></table></div>
+        <div class="pager"><button class="btn btn-ghost btn-sm" id="prev">← Anterior</button><span id="pageinfo" class="muted small"></span><button class="btn btn-ghost btn-sm" id="next">Siguiente →</button></div>
+      </section>
+
+      <section class="tabpane" id="tab-map">
+        <div class="card flush"><div id="map"></div></div>
+        <p class="muted small">Se muestran hasta 2,500 prospectos del filtro actual. Verde = A, ámbar = B, gris = C.</p>
+      </section>
+
+      <section class="tabpane" id="tab-pipeline">
+        <p class="muted">Tu pipeline se guarda en este navegador. Cambia el estado desde la ficha de cada prospecto.</p>
+        <div class="kanban" id="kanban"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Ficha de prospecto -->
+  <div class="drawer-backdrop" id="drawer-bg"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true"><div id="drawer-body"></div></aside>
+
+  <!-- Asistente IA -->
+  <button class="ai-fab" id="ai-fab" aria-label="Abrir asistente">✨ <span>Copiloto IA</span></button>
+  <section class="ai-panel" id="ai-panel" aria-label="Asistente de IA">
+    <header><div><b>Copiloto Licor</b><div class="muted small" id="ai-engine">Asistente de prospección</div></div><button class="link" id="ai-close" aria-label="Cerrar">✕</button></header>
+    <div class="ai-msgs" id="ai-msgs">
+      <div class="msg bot">¡Hola Alex! 👋 Pregúntame por prospectos, zonas, tipos de cocina o cómo funciona el trámite de licencia.</div>
+      <div class="suggest" id="ai-suggest">
+        <button>¿Cuáles son las 10 mejores taquerías sin licencia en Pilsen?</button>
+        <button>¿Qué zonas tienen más prospectos nivel A?</button>
+        <button>Restaurantes nuevos con patio sin licencia</button>
+        <button>¿Qué requisitos tiene la licencia Incidental Activity?</button>
+      </div>
+    </div>
+    <form class="ai-input" id="ai-form"><input id="ai-text" placeholder="Escribe tu pregunta…" autocomplete="off" /><button class="btn btn-primary btn-sm">Enviar</button></form>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -83,7 +83,7 @@ app.use((req, res, next) => {
 const requireAuth = (req, res, next) => {
   const s = readToken(req);
   if (s) { req.user = s.u; return next(); }
-  if (req.path.startsWith("/api/")) return res.status(401).json({ error: "No autorizado" });
+  if (req.originalUrl.startsWith("/api/")) return res.status(401).json({ error: "No autorizado" });
   return res.redirect("/login");
 };
 

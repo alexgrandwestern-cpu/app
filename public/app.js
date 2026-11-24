@@ -163,7 +163,44 @@ function renderPipeline() {
   $$("#kanban .kcard").forEach((el) => el.addEventListener("click", () => openProspect(el.dataset.id)));
 }
 
+// ---------- Marketplace (admin) ----------
+const MK_ST = { requested: "Solicitada", accepted: "Aceptada", declined: "Rechazada", completed: "Completada", cancelled: "Cancelada" };
+const EX_ST = { pending: "⏳ Pendiente", approved: "✅ Publicado", rejected: "✖ Rechazado", paused: "⏸ Pausado" };
+async function loadMarket() {
+  const d = await api("/api/mk/admin");
+  const s = d.stats, money = (n) => "$" + fmt(n);
+  $("#mk-db").textContent = d.db === "postgres" ? "· Base de datos: Postgres" : "· ⚠️ Sin base de datos: los datos se borran al redeploy";
+  $("#count-mk").textContent = s.pending || s.open || "";
+  $("#mk-kpis").innerHTML = `
+    <div class="kpi"><div class="v">${s.experts}</div><div class="l">expertos publicados · ${s.pending} pendientes</div></div>
+    <div class="kpi"><div class="v">${s.bookings}</div><div class="l">reservas · ${s.open} abiertas</div></div>
+    <div class="kpi hl"><div class="v">${money(s.commission)}</div><div class="l">comisión ganada (${d.feePct}% de ${money(s.gmv)})</div></div>
+    <div class="kpi"><div class="v">${s.completed}</div><div class="l">servicios completados · ${s.reviews} reseñas</div></div>`;
+  $("#mk-experts tbody").innerHTML = d.experts.map((e) => `<tr>
+    <td class="biz">${esc(e.name)}${e.featured ? " 🏅" : ""}<small>${esc(e.email || "")} ${e.phone ? "· " + esc(e.phone) : ""}</small></td>
+    <td>${EX_ST[e.status] || e.status}</td><td class="num">${e.rating ? "★ " + e.rating + " (" + e.reviewsCount + ")" : "—"}</td><td class="num">${e.bookings}</td>
+    <td><div class="actions">
+      ${e.status !== "approved" ? `<button class="btn btn-primary btn-sm" data-ex="${esc(e.id)}" data-a="approve">Aprobar</button>` : `<button class="btn btn-ghost btn-sm" data-ex="${esc(e.id)}" data-a="pause">Pausar</button>`}
+      ${e.status === "pending" ? `<button class="btn btn-ghost btn-sm" data-ex="${esc(e.id)}" data-a="reject">Rechazar</button>` : ""}
+      <button class="btn btn-ghost btn-sm" data-ex="${esc(e.id)}" data-a="${e.featured ? "unfeature" : "feature"}">${e.featured ? "Quitar destacado" : "Destacar"}</button>
+      <a class="btn btn-ghost btn-sm" href="${esc(e.manageLink)}" target="_blank" rel="noopener">Panel del experto ↗</a>
+      ${e.status === "approved" ? `<a class="btn btn-ghost btn-sm" href="/experto/${esc(e.slug)}" target="_blank" rel="noopener">Perfil ↗</a>` : ""}
+    </div></td></tr>`).join("");
+  $$("#mk-experts [data-ex]").forEach((b) => b.addEventListener("click", async () => {
+    await api(`/api/mk/admin/expert/${b.dataset.ex}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: b.dataset.a }) });
+    loadMarket();
+  }));
+  $("#mk-bookings tbody").innerHTML = d.bookings.map((b) => `<tr><td>${new Date(b.createdAt).toLocaleDateString("es-MX")}</td>
+    <td class="biz">${esc(b.business)}<small>${esc(b.contactName)} · ${esc(b.email)}</small></td><td>${esc(b.expertName)}<br><span class="muted small">${esc(b.serviceName)}</span></td>
+    <td><span class="status">${MK_ST[b.status]}</span></td><td class="num">${b.price != null ? money(b.price) : "—"}</td><td class="num">${b.fee != null ? money(b.fee) : "—"}</td></tr>`).join("")
+    || `<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">Aún no hay reservas. Comparte tu perfil con prospectos desde su ficha (botón "Invitar a reservar").</td></tr>`;
+}
+
 // ---------- Ficha ----------
+function inviteLink(p) {
+  const q = new URLSearchParams({ negocio: p.name, direccion: `${p.address}, Chicago ${p.zip}`, p: p.id });
+  return `${location.origin}/experto/alex-zavala?${q}`;
+}
 function layoutPitch(p) {
   if (p.segment === "Tienda / Grocery") return "Con Package Goods: plano de tienda, muro de poder, refrigerados al fondo y escalera de precios para vinos y licores.";
   if (p.segment === "Restaurante con comedor") return "Diseño de barra y contrabarra, carta de bebidas visible y exhibición de botellas premium.";
@@ -217,6 +254,11 @@ async function openProspect(id) {
         <select id="d-status">${STATUSES.map(([k, l]) => `<option value="${k}" ${k === (mine.status || "") ? "selected" : ""}>${l}</option>`).join("")}</select>
         <textarea id="d-note" rows="3" placeholder="Notas: teléfono, con quién hablaste, próxima cita…" style="margin-top:8px">${esc(mine.note || "")}</textarea>
       </div>
+      <div class="d-section"><h4>Invitar a reservar en el marketplace</h4>
+        <p class="muted small" style="margin:0 0 8px">Envía este enlace por WhatsApp o correo: abre tu perfil con el nombre y la dirección del negocio ya llenos.</p>
+        <div class="actions"><button class="btn btn-primary btn-sm" id="d-invite">🔗 Copiar enlace de reserva</button>
+        <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(`Hola, soy Alex Zavala. Le ayudo a ${p.name} a obtener su licencia de licor. Reserve un diagnóstico aquí: ${inviteLink(p)}`)}">💬 Enviar por WhatsApp</a></div>
+      </div>
       <div class="d-section"><h4>Guion de llamada sugerido</h4><div class="script">${esc(callScript(p))}</div>
         <button class="btn btn-ghost btn-sm" id="d-copy" style="margin-top:8px">Copiar guion</button></div>
       ${p.nearby.length ? `<div class="d-section"><h4>Otros prospectos cerca (ruta de visita)</h4>${p.nearby.map((n) => `<div class="topitem" data-id="${esc(n.id)}" style="margin-bottom:6px"><span class="tier tier-${n.tier}">${n.score}</span><div class="t"><b>${esc(n.name)}</b><span class="muted small">${esc(n.address)}</span></div></div>`).join("")}</div>` : ""}
@@ -231,6 +273,7 @@ async function openProspect(id) {
   $("#d-note").addEventListener("input", save);
   $("#d-copy").addEventListener("click", () => navigator.clipboard?.writeText(callScript(p)).then(() => ($("#d-copy").textContent = "¡Copiado!")));
   $("#d-close").addEventListener("click", closeDrawer);
+  $("#d-invite").addEventListener("click", () => navigator.clipboard?.writeText(inviteLink(p)).then(() => ($("#d-invite").textContent = "¡Enlace copiado!")));
   $$("#drawer-body .topitem").forEach((el) => el.addEventListener("click", () => openProspect(el.dataset.id)));
   $("#drawer").classList.add("show"); $("#drawer-bg").classList.add("show"); $("#drawer").scrollTop = 0;
 }
@@ -246,7 +289,7 @@ $$(".tab").forEach((t) => t.addEventListener("click", () => {
   refreshTab();
 }));
 function refreshTab() {
-  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline() }[state.tab];
+  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket }[state.tab];
   run().catch((e) => console.error(e));
 }
 function refreshAll() {

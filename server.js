@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { loadFromCity, loadFromCache } from "./lib/data.js";
 import { filterProspects, stats, facets, toCSV } from "./lib/query.js";
 import { ask, aiEnabled } from "./lib/assistant.js";
+import { marketplaceRouter } from "./lib/marketplace.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -200,7 +201,14 @@ api.post("/refresh", (req, res) => {
   refresh();
   res.json({ ok: true, status });
 });
+app.use("/api/mk", marketplaceRouter(requireAuth));
 app.use("/api", api);
+
+// Páginas del marketplace con parámetros en la URL
+const page = (f) => (req, res) => res.sendFile(path.join(__dirname, "public", f));
+app.get("/experto/:slug", page("mk-experto.html"));
+app.get("/reserva/:token", page("mk-reserva.html"));
+app.get("/experto-panel/:token", page("mk-panel.html"));
 
 app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"], maxAge: "5m" }));
 app.use((req, res) => res.status(404).sendFile(path.join(__dirname, "public", "index.html")));

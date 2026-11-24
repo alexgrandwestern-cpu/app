@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ofrece tus servicios — Alex Solutions Expertos</title>
+  <meta name="description" content="Gestores y consultores: publiquen sus servicios de licencias de licor, layout, BASSET y permisos para restaurantes y tiendas de Chicago." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/mk.css" />
+</head>
+<body class="mk">
+  <main class="container page">
+    <span class="pill">Para gestores y consultores</span>
+    <h1 style="margin-top:12px">Ofrece tus servicios en Alex Solutions</h1>
+    <p style="color:var(--muted);font-size:17px;max-width:680px">Publica tu perfil, recibe solicitudes de restaurantes y tiendas de Chicago que necesitan licencia de licor, layout o capacitación, y construye tu reputación con reseñas verificadas. Tu perfil se publica después de que Alex lo revise. <span id="fee"></span></p>
+    <div id="done"></div>
+    <form class="panel form" id="af">
+      <div id="err"></div>
+      <h2>Tu perfil</h2>
+      <div class="f2"><div class="f"><label>Nombre completo *</label><input name="name" required maxlength="80" /></div><div class="f"><label>Correo *</label><input type="email" name="email" required maxlength="120" /></div></div>
+      <div class="f2"><div class="f"><label>Teléfono</label><input name="phone" maxlength="40" /></div><div class="f"><label>Años de experiencia</label><input type="number" min="0" name="yearsExp" /></div></div>
+      <div class="f"><label>Titular (una línea)</label><input name="headline" maxlength="120" placeholder="Ej.: Gestor de licencias de licor en el South Side" /></div>
+      <div class="f"><label>Acerca de ti</label><textarea name="bio" rows="4" maxlength="2000"></textarea></div>
+      <div class="f2"><div class="f"><label>Zonas que atiendes (separadas por coma)</label><input name="areas" placeholder="Pilsen, Little Village, Logan Square" /></div><div class="f"><label>Idiomas</label><input name="languages" placeholder="Español, English" /></div></div>
+      <div class="f"><label>Foto (URL https, opcional)</label><input name="photo" placeholder="https://…" /></div>
+      <h2 style="margin-top:18px">Servicios *</h2>
+      <div id="svcs"></div>
+      <button type="button" class="btn btn-ghost btn-sm" id="add">+ Agregar servicio</button>
+      <div style="margin-top:20px"><button class="btn btn-primary" type="submit">Enviar solicitud</button></div>
+    </form>
+  </main>
+  <script src="/mk.js"></script>
+  <script src="/mk-svc.js"></script>
+  <script>
+    const { esc, api } = MK;
+    MK.chrome();
+    let cats = [];
+    (async () => {
+      const m = await api("/api/mk/meta"); cats = m.categories;
+      document.getElementById("fee").textContent = `La plataforma cobra una comisión del ${m.feePct}% sobre los servicios completados.`;
+      SVC.mount(document.getElementById("svcs"), cats, [{}]);
+    })();
+    document.getElementById("add").addEventListener("click", () => SVC.add(document.getElementById("svcs"), cats, {}));
+    document.getElementById("af").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      data.services = SVC.read(document.getElementById("svcs"));
+      try {
+        const r = await api("/api/mk/apply", { method: "POST", body: JSON.stringify(data) });
+        const url = location.origin + r.link;
+        e.target.remove();
+        document.getElementById("done").innerHTML = `<div class="msg-ok"><b>¡Solicitud recibida!</b> Este es tu <b>enlace privado</b> para administrar tu perfil y tus reservas. Guárdalo: es tu llave de acceso.
+          <div class="linkbox"><input readonly value="${esc(url)}" id="lnk"><button class="btn btn-ghost btn-sm" id="cp">Copiar</button><a class="btn btn-primary btn-sm" href="${esc(r.link)}">Abrir mi panel</a></div></div>`;
+        document.getElementById("cp").addEventListener("click", () => navigator.clipboard?.writeText(url).then(() => (document.getElementById("cp").textContent = "¡Copiado!")));
+      } catch (err) { document.getElementById("err").innerHTML = `<div class="msg-err">${esc(err.message)}</div>`; window.scrollTo(0, 0); }
+    });
+  </script>
+</body>
+</html>

@@ -4,6 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Abrir en el teléfono — Alex Solutions</title>
+  <meta name="description" content="Códigos QR para abrir Alex Solutions en tu teléfono." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Alex Solutions, Inc" />
+  <meta property="og:title" content="Abrir en el teléfono — Alex Solutions" />
+  <meta property="og:description" content="Códigos QR para abrir Alex Solutions en tu teléfono." />
+  <meta property="og:url" content="https://licenciapro-chicago.onrender.com/qr" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&h=630&q=70" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#7a1f2b" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
@@ -31,19 +40,7 @@
     <div class="grid" id="grid"></div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script>
-    const items = [
-      ["/app", "Mi panel", "Prospectos, marketplace, distribuidores y asistente (pide usuario y contraseña)", true],
-      ["/", "Página principal", "La página pública de Alex Solutions, Inc"],
-      ["/expertos", "Marketplace", "Buscar y reservar expertos"],
-      ["/contacto", "Mi tarjeta", "Tarjeta de contacto para compartir"],
-    ];
-    document.getElementById("grid").innerHTML = items.map(([p, t, d, main]) => {
-      const url = location.origin + p;
-      const q = qrcode(0, "M"); q.addData(url); q.make();
-      return `<div class="q${main ? " main" : ""}"><h2>${t}</h2><p>${d}</p>${q.createImgTag(8, 8, t)}<a href="${p}">${url.replace(/^https?:\/\//, "")}</a></div>`;
-    }).join("");
-  </script>
+  <script src="/js/qr.js"></script>
   <script src="/i18n.js"></script>
 </body>
 </html>

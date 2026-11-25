@@ -137,3 +137,5 @@ input[type=range] { accent-color: var(--brand); width: 100%; }
 .chain .arrow { text-align: center; color: var(--brand); font-weight: 700; }
 .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .cat-tabs .chip { padding: 8px 14px; }
+.app-error { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: #fde8e8; color: #8b1c1c; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
+tr[data-id]:focus-visible, .topitem:focus-visible, .kcard:focus-visible, .bar:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 55%, transparent); outline-offset: -2px; }

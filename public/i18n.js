@@ -126,6 +126,16 @@
     "📄 Ver etiqueta en TTB": "📄 View label on TTB", "🔎 Buscar en Google": "🔎 Search on Google",
 
     // ---------- Datos ----------
+    "Marca a buscar": "Brand to search", "Filtrar distribuidores": "Filter distributors", "Buscar en el radar": "Search the radar", "Periodo": "Period", "Buscar producto": "Search product", "Pregunta para el asistente": "Question for the assistant",
+    "Página no encontrada — Alex Solutions, Inc": "Page not found — Alex Solutions, Inc", "No encontramos esta página": "We couldn't find this page",
+    "Puede que el enlace esté mal escrito o que la página ya no exista.": "The link may be mistyped or the page may no longer exist.",
+    "Algo salió mal — Alex Solutions, Inc": "Something went wrong — Alex Solutions, Inc", "Algo salió mal de nuestro lado": "Something went wrong on our end",
+    "Ya quedó registrado el problema. Intenta de nuevo en unos minutos.": "The problem has been logged. Please try again in a few minutes.", "Contactar a Alex": "Contact Alex",
+    "Aviso de privacidad — Alex Solutions, Inc": "Privacy notice — Alex Solutions, Inc", "Términos de uso — Alex Solutions, Inc": "Terms of use — Alex Solutions, Inc",
+    "Términos de uso": "Terms of use", "Privacidad": "Privacy", "Términos": "Terms", "Aviso de privacidad": "Privacy notice",
+    "Al enviar aceptas los": "By submitting you accept the", "y el": "and the", "términos de uso": "terms of use", "aviso de privacidad": "privacy notice",
+    "Hubo un problema al cargar los datos. Revisa tu conexión e intenta de nuevo.": "There was a problem loading the data. Check your connection and try again.", "Reintentar": "Retry",
+    "⬇ Respaldo de la base de datos": "⬇ Database backup",
     "Productos": "Products", "Buscador de productos del mercado": "Market product search", "🥃 Licores": "🥃 Liquors", "🍷 Vinos": "🍷 Wines", "🍺 Cervezas": "🍺 Beers",
     "🍋 Mixers y suministros de bar": "🍋 Mixers & bar supplies", "Busca por marca o nombre del producto…": "Search by brand or product name…", "Aprobada": "Approved",
     "Licores, vinos y cervezas: búsqueda en vivo en el registro federal de etiquetas de la TTB (todo lo aprobado para venderse en EE. UU. en los últimos 6 años). Mixers y suministros de bar: tu propio catálogo.": "Liquors, wines and beers: live search of the TTB federal label registry (everything approved for sale in the U.S. in the last 6 years). Mixers & bar supplies: your own catalog.",
@@ -412,6 +422,7 @@
   }
   function start() {
     switcher();
+    document.querySelectorAll("[data-lang]").forEach((el) => { el.hidden = el.dataset.lang !== lang; });
     if (lang !== "en") return;
     document.title = t(document.title);
     walk(document.body);

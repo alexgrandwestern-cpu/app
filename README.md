@@ -1,56 +1,95 @@
-# LicenciaPro Chicago 🍷
+# Alex Solutions, Inc 🍷
 
-**Creado por Alex Zavala.** Plataforma web para encontrar restaurantes y negocios de comida en Chicago que **todavía no tienen licencia de licor**: los clientes potenciales del servicio de gestión de licencias de Alex.
+**Creado por Alex Zavala.** Plataforma web para el negocio de licencias de licor y layout en Chicago:
 
-## Qué hace
+- **Prospectos:** restaurantes y tiendas de Chicago que todavía no tienen licencia de licor, con puntaje y razones.
+- **Marketplace de expertos:** modelo tipo Airbnb, con reservas, reseñas verificadas y comisión.
+- **Inteligencia comercial:** radar de productos nuevos (TTB COLA), red de distribuidores de Illinois, mapa de conexiones y buscador de productos del mercado.
+- **Asesoría de layout:** guía interactiva para tiendas de Fine Wine & Spirits.
+- **Bilingüe:** español e inglés en todas las páginas.
 
-- **Descarga automática** (al arrancar y cada 24 h) de todas las licencias activas de la Ciudad de Chicago (~53,000 registros, dataset `uupf-x98q`) y de las inspecciones sanitarias de los últimos 3 años (`4ijn-s7e5`).
-- **Detección de prospectos**: agrupa las licencias por cuenta + sitio. Un prospecto es un negocio con *Retail Food Establishment* sin ninguna licencia de licor (Incidental Activity, Tavern, Package Goods, Caterer's Liquor, Late Hour, Special Event) en la misma cuenta/sitio ni en la misma dirección.
-- **Enriquecimiento**: segmento (comedor, café, panadería/deli, para llevar, tienda), tipo de cocina por nombre, cadenas e instituciones marcadas, patio y entretenimiento, antigüedad, última inspección y densidad de licor en el área comunitaria.
-- **Puntaje 0–100** con niveles A/B/C y razones explicadas, más la licencia recomendada.
-- **Panel**: KPIs, segmentos, cocinas, mejores zonas, tabla con filtros (área, ZIP, ward, segmento, cocina, puntaje, nuevos, patio), mapa interactivo, ficha con guion de llamada, pipeline (en el navegador) y exportación a CSV.
-- **Copiloto IA**: con `ANTHROPIC_API_KEY` usa Claude con herramientas sobre los datos reales; sin clave, responde con un motor local.
-- **Landing page** de marketing y **login** protegido.
+Producción: https://licenciapro-chicago.onrender.com
 
-## Alex Solutions, Inc: otros servicios
+## Funciones
 
-- **`/asesoria-layout`**: guía interactiva de layout para tiendas de Fine Wine & Spirits (plano de 10 zonas, estantería por niveles, calculadora de espacio vs. ventas, autodiagnóstico, plan de acción y solicitud de asesoría). Viene de la sesión anterior (`vinos-licores.html`).
-- **`/contacto`**: tarjeta de contacto con botones de llamar, WhatsApp y correo, QR al enlace, QR vCard y descarga `.vcf` (`/contacto.vcf`). Los datos se configuran con variables de entorno.
+| Área | Ruta | Acceso |
+|---|---|---|
+| Página principal | `/` | Pública |
+| Guía de layout | `/asesoria-layout` | Pública |
+| Marketplace (buscar, perfil, reservar, unirse) | `/expertos`, `/experto/:slug`, `/unete` | Pública |
+| Seguimiento de reserva | `/reserva/:token` | Enlace privado del cliente |
+| Panel del experto | `/experto-panel/:token` | Enlace privado del experto |
+| Tarjeta de contacto y QR | `/contacto`, `/contacto.vcf`, `/qr` | Pública |
+| Privacidad y términos | `/privacidad`, `/terminos` | Pública |
+| Panel de Alex | `/app` | Usuario y contraseña |
 
-## Marketplace de expertos (modelo tipo Airbnb)
+**Pestañas del panel:** Resumen, Prospectos, Mapa, Pipeline, Marketplace, Productos, Radar de productos y Distribuidores, más el Copiloto IA.
 
-- **`/expertos`**: búsqueda por servicio, zona y palabra clave, con tarjetas, calificación y "Experto destacado".
-- **`/experto/:slug`**: perfil con servicios, reseñas verificadas y tarjeta de reserva.
-- **`/reserva/:token`**: enlace privado del cliente. Muestra el estado (solicitada, aceptada, completada), permite cancelar y dejar una reseña al terminar.
-- **`/unete`**: alta de nuevos expertos. Entra como *pendiente* hasta que Alex lo aprueba.
-- **`/experto-panel/:token`**: enlace privado del experto. Aceptar (con precio final), rechazar, completar, ver ganancias netas y editar perfil y servicios.
-- **Panel de Alex → pestaña Marketplace**: aprobar, pausar o destacar expertos, ver reservas, GMV y comisión. Cada prospecto tiene "Invitar a reservar".
-- **Comisión**: `PLATFORM_FEE_PCT` (15% por defecto) sobre servicios completados. Todavía no hay cobro en línea.
-- **Datos**: Postgres vía `DATABASE_URL` (tabla `docs`).
+**Fuentes de datos (se actualizan solas):**
+- Ciudad de Chicago: licencias activas (`uupf-x98q`) e inspecciones (`4ijn-s7e5`), cada 24 h.
+- TTB: listas de mayoristas e importadores con permiso federal y etiquetas aprobadas (COLA), cada 24 h. Los distribuidores se ubican en el mapa con el geocodificador del Censo de EE. UU.
+- `certs/` incluye el certificado intermedio de Entrust que `ttbonline.gov` no envía. Se carga con `NODE_EXTRA_CA_CERTS`.
 
-## Variables de entorno
+## Instalar y correr localmente
 
-| Variable | Descripción |
-|---|---|
-| `ADMIN_USER` | Usuario de acceso (por defecto `alex`) |
-| `ADMIN_PASSWORD` | Contraseña de acceso |
-| `SESSION_SECRET` | Secreto para firmar la sesión |
-| `ANTHROPIC_API_KEY` | (Opcional) activa el asistente con Claude |
-| `REFRESH_HOURS` | Cada cuántas horas se vuelven a descargar los datos (24) |
-| `CONTACT_NAME`, `CONTACT_TITLE`, `CONTACT_COMPANY` | Tarjeta de contacto (por defecto Alex Zavala · Alex Solutions, Inc) |
-| `CONTACT_PHONE`, `CONTACT_WHATSAPP`, `CONTACT_EMAIL` | Teléfono, WhatsApp (solo dígitos con código de país) y correo |
-| `CONTACT_CITY`, `CONTACT_WEBSITE`, `CONTACT_INSTAGRAM`, `CONTACT_LINKEDIN` | Opcionales |
-
-## Correr localmente
+Requisitos: Node.js 20 o superior. Postgres es opcional; sin él, los datos se guardan en `data/`.
 
 ```bash
 npm install
-ADMIN_PASSWORD=mi-clave npm start
+cp .env.example .env      # y edita los valores
+node --env-file=.env server.js
 # http://localhost:3000
 ```
 
-## Deploy en Render
+## Variables de entorno
 
-El archivo `render.yaml` define el servicio web (Node). Cada push a `main` vuelve a publicar.
+| Variable | Obligatoria | Descripción |
+|---|---|---|
+| `ADMIN_USER` | No (por defecto `alex`) | Usuario del panel |
+| `ADMIN_PASSWORD` | **Sí** | Contraseña del panel. Sin ella el acceso queda bloqueado |
+| `SESSION_SECRET` | **Sí** | Secreto largo y aleatorio para firmar la sesión |
+| `DATABASE_URL` | Recomendada | Postgres para marketplace, directorio, catálogo y radar |
+| `ANTHROPIC_API_KEY` | No | Activa el Copiloto con IA y la investigación de distribuidores |
+| `NODE_EXTRA_CA_CERTS` | Sí en producción | `certs/entrust-ov-tls-issuing-rsa-ca2.pem` |
+| `NODE_ENV` | Sí en producción | `production` |
+| `PLATFORM_FEE_PCT` | No (15) | Comisión del marketplace |
+| `REFRESH_HOURS` | No (24) | Frecuencia de actualización de datos de Chicago |
+| `CONTACT_*` | No | Datos de la tarjeta de contacto (`NAME`, `TITLE`, `COMPANY`, `PHONE`, `WHATSAPP`, `EMAIL`, `CITY`, `WEBSITE`, `INSTAGRAM`, `LINKEDIN`) |
 
-> Los datos provienen del [Portal de Datos de Chicago](https://data.cityofchicago.org). La información sobre trámites es orientativa: confirma los requisitos vigentes con BACP.
+Ninguna clave va en el código: todo se configura en Render → Environment, o en `.env` en local (`.env` está en `.gitignore`).
+
+## Seguridad
+
+- **Content Security Policy** estricta: sin scripts inline, solo scripts propios y de cdnjs. También HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y redirección a HTTPS.
+- **Sin CORS:** solo el propio dominio puede llamar a la API desde un navegador.
+- **Sesión:** cookie `HttpOnly`, `Secure` y `SameSite=Lax`, firmada con HMAC. Comparación de contraseña en tiempo constante.
+- **Rate limiting por IP:**
+
+  | Ruta | Límite |
+  |---|---|
+  | Login | 10 intentos / 15 min |
+  | API general | 600 / 10 min |
+  | Asistente | 30 / 10 min |
+  | Investigación con IA | 20 / h |
+  | Búsqueda de productos | 60 / 10 min |
+  | Reservas | 10 / h |
+  | Altas de expertos | 5 / h |
+
+- **Validación en el servidor:** longitudes máximas en todos los campos, cuerpo JSON de 100 KB como máximo, parámetros de 200 caracteres como máximo y máximo de registros por consulta. No hay subida de archivos.
+- **Base de datos:** solo consultas parametrizadas (`pg`).
+- **Permisos:** panel y API internas exigen sesión. Expertos y clientes acceden solo a sus propios datos mediante enlaces privados aleatorios de 192 bits.
+- **XSS:** todo texto dinámico se escapa antes de insertarse en la página.
+- **Dependencias:** versiones fijadas. Cada build ejecuta `npm audit --omit=dev` y el resultado aparece en los logs de build de Render.
+
+## Errores, logs y respaldos
+
+- Página 404 propia y página 500 sin detalles técnicos. El error real se registra en los logs de Render con un número de referencia.
+- **Logs:** Render → servicio → *Logs*.
+- **Respaldo:** en el panel, pestaña Marketplace → **⬇ Respaldo de la base de datos**. Descarga un JSON con todas las colecciones. Contiene enlaces privados de expertos y clientes: guárdalo en un lugar seguro.
+- **Importante:** la base de datos gratis de Render **no tiene respaldos automáticos y vence el 24/12/2026**. Pásala a un plan de pago antes de esa fecha (incluye respaldos diarios).
+
+## Deploy
+
+`render.yaml` define el servicio. Cada push a `main` vuelve a publicar automáticamente.
+
+> Información orientativa. Los requisitos de licencias los fijan BACP (Chicago), ILCC (Illinois) y TTB.

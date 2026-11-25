@@ -5,7 +5,8 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "audit": "npm audit --omit=dev"
   },
   "engines": {
     "node": ">=20"
@@ -13,8 +14,9 @@
   "author": "Alex Zavala",
   "license": "UNLICENSED",
   "dependencies": {
-    "@anthropic-ai/sdk": "latest",
+    "@anthropic-ai/sdk": "^1.14.0",
+    "compression": "^1.8.2",
     "express": "^4.21.2",
-    "pg": "^8.13.1"
+    "pg": "^8.23.1"
   }
 }

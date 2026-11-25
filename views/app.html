@@ -101,7 +101,7 @@
         <div class="card"><h3>Buscador de productos del mercado</h3>
           <p class="muted small" style="margin:-8px 0 12px">Licores, vinos y cervezas: búsqueda en vivo en el registro federal de etiquetas de la TTB (todo lo aprobado para venderse en EE. UU. en los últimos 6 años). Mixers y suministros de bar: tu propio catálogo.</p>
           <div class="cat-tabs" id="cat-tabs"><button class="chip on" data-c="liquors">🥃 Licores</button><button class="chip" data-c="wines">🍷 Vinos</button><button class="chip" data-c="beers">🍺 Cervezas</button><button class="chip" data-c="mixers">🍋 Mixers y suministros de bar</button></div>
-          <form id="cat-form" class="dist-search" style="margin-top:12px"><input id="cat-q" placeholder="Busca por marca o nombre del producto…" autocomplete="off" /><button class="btn btn-primary">Buscar</button></form>
+          <form id="cat-form" class="dist-search" style="margin-top:12px"><input id="cat-q" aria-label="Buscar producto" placeholder="Busca por marca o nombre del producto…" autocomplete="off" /><button class="btn btn-primary">Buscar</button></form>
           <div id="cat-status" class="muted small" style="margin-top:8px"></div>
         </div>
         <div id="cat-own"></div>
@@ -111,7 +111,7 @@
       <section class="tabpane" id="tab-radar">
         <div class="card"><h3>Radar de productos nuevos</h3>
           <p class="muted small" style="margin:-8px 0 12px">Etiquetas aprobadas por la TTB (COLA) en los últimos días: cada producto nuevo o etiqueta nueva que se venderá en EE. UU. Haz clic en uno para ver su mapa de conexiones: proveedor → distribuidor en Illinois → cuentas en Chicago. <span id="radar-meta"></span></p>
-          <div class="radar-filters"><input id="radar-q" class="inp" placeholder="Buscar marca, producto, importador, país…"><select id="radar-days" class="inp"><option value="7">7 días</option><option value="30" selected>30 días</option><option value="60">60 días</option></select><label class="check"><input type="checkbox" id="radar-imp"> Solo importados</label></div>
+          <div class="radar-filters"><input id="radar-q" class="inp" aria-label="Buscar en el radar" placeholder="Buscar marca, producto, importador, país…"><select id="radar-days" class="inp" aria-label="Periodo"><option value="7">7 días</option><option value="30" selected>30 días</option><option value="60">60 días</option></select><label class="check"><input type="checkbox" id="radar-imp"> Solo importados</label></div>
           <div class="chips" id="radar-groups" style="margin-top:10px"></div>
         </div>
         <div class="table-wrap card flush"><table class="tbl hover" id="radar-tbl"><thead><tr><th>Fecha</th><th>Marca · producto</th><th class="hide-sm">Tipo</th><th class="hide-md">Origen</th><th class="hide-sm">Importador / proveedor</th></tr></thead><tbody></tbody></table></div>
@@ -122,17 +122,17 @@
         <div class="card">
           <h3>¿Quién distribuye esta bebida en Illinois?</h3>
           <p class="muted small" style="margin:-8px 0 12px">Escribe cualquier marca: vino, tequila, cerveza, whisky… Primero se busca en tu directorio; si no está, la IA la investiga en internet con fuentes y la deja <b>sin verificar</b> hasta que tú la confirmes.</p>
-          <form id="dist-form" class="dist-search"><input id="dist-q" placeholder="Ej.: Don Julio, Modelo Especial, Josh Cellars, Tito's…" autocomplete="off" /><button class="btn btn-primary">Buscar</button></form>
+          <form id="dist-form" class="dist-search"><input id="dist-q" aria-label="Marca a buscar" placeholder="Ej.: Don Julio, Modelo Especial, Josh Cellars, Tito's…" autocomplete="off" /><button class="btn btn-primary">Buscar</button></form>
           <div id="dist-status" class="muted small" style="margin-top:8px"></div>
         </div>
         <div id="dist-results"></div>
-        <div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">Red de distribuidores de Illinois <span class="muted small" id="net-meta"></span></h3><input id="net-q" placeholder="Filtrar por nombre, ciudad o marca" class="inp" style="max-width:280px"></div>
+        <div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">Red de distribuidores de Illinois <span class="muted small" id="net-meta"></span></h3><input id="net-q" aria-label="Filtrar distribuidores" placeholder="Filtrar por nombre, ciudad o marca" class="inp" style="max-width:280px"></div>
           <div id="net-map" style="height:380px;border-radius:12px;margin-bottom:12px"></div><div id="net-list" class="table-wrap"></div></div>
         <div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">Directorio de marcas</h3><button class="btn btn-ghost btn-sm" id="dist-add">+ Agregar manualmente</button></div><div id="dist-all"></div></div>
       </section>
 
       <section class="tabpane" id="tab-market">
-        <div class="list-head"><span class="muted">Marketplace de expertos: aprueba perfiles, sigue reservas y comisiones. <span id="mk-db"></span></span>
+        <div class="list-head"><span class="muted">Marketplace de expertos: aprueba perfiles, sigue reservas y comisiones. <span id="mk-db"></span> <a href="/api/backup" download>⬇ Respaldo de la base de datos</a></span>
           <span><a class="btn btn-ghost btn-sm" href="/expertos" target="_blank" rel="noopener">Ver marketplace ↗</a> <a class="btn btn-ghost btn-sm" href="/unete" target="_blank" rel="noopener">Formulario de alta ↗</a></span></div>
         <div class="kpis" id="mk-kpis"></div>
         <div class="card"><h3>Expertos</h3><div class="table-wrap"><table class="tbl" id="mk-experts"><thead><tr><th>Experto</th><th>Estado</th><th class="num">Reseñas</th><th class="num">Reservas</th><th>Acciones</th></tr></thead><tbody></tbody></table></div></div>
@@ -158,7 +158,7 @@
         <button>¿Qué requisitos tiene la licencia Incidental Activity?</button>
       </div>
     </div>
-    <form class="ai-input" id="ai-form"><input id="ai-text" placeholder="Escribe tu pregunta…" autocomplete="off" /><button class="btn btn-primary btn-sm">Enviar</button></form>
+    <form class="ai-input" id="ai-form"><input id="ai-text" aria-label="Pregunta para el asistente" placeholder="Escribe tu pregunta…" autocomplete="off" /><button class="btn btn-primary btn-sm">Enviar</button></form>
   </section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>

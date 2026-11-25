@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /app
+Disallow: /login
+Disallow: /api/
+Disallow: /reserva/
+Disallow: /experto-panel/
+Disallow: /qr

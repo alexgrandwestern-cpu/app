@@ -1,4 +1,5 @@
 import express from "express";
+import compression from "compression";
 import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,11 +9,15 @@ import { ask, aiEnabled } from "./lib/assistant.js";
 import { marketplaceRouter } from "./lib/marketplace.js";
 import { distributorsRouter } from "./lib/distributors.js";
 import { tradeRouter, syncTrade } from "./lib/trade.js";
+import { exportAll } from "./lib/db.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const ADMIN_USER = (process.env.ADMIN_USER || "alex").toLowerCase();
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "cambiar-esta-clave";
+// Sin ADMIN_PASSWORD configurada nadie puede entrar (se genera una clave aleatoria imposible de adivinar).
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || crypto.randomBytes(32).toString("hex");
+if (!process.env.ADMIN_PASSWORD) console.warn("⚠️ ADMIN_PASSWORD no está configurada: el acceso al panel está bloqueado.");
+if (!process.env.SESSION_SECRET) console.warn("⚠️ SESSION_SECRET no está configurada: las sesiones se pierden al reiniciar.");
 const SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 const REFRESH_HOURS = Number(process.env.REFRESH_HOURS || 24);
 
@@ -74,14 +79,63 @@ function rateLimited(ip) {
 const app = express();
 app.set("trust proxy", 1);
 app.disable("x-powered-by");
-app.use(express.json({ limit: "200kb" }));
-app.use(express.urlencoded({ extended: false }));
+app.use(compression());
+const IS_PROD = process.env.NODE_ENV === "production" || !!process.env.RENDER;
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' https://cdnjs.cloudflare.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  "connect-src 'self'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+  "upgrade-insecure-requests",
+].join("; ");
+
+// HTTPS obligatorio detrás del proxy de Render
 app.use((req, res, next) => {
+  if (IS_PROD && req.headers["x-forwarded-proto"] === "http") return res.redirect(301, `https://${req.headers.host}${req.originalUrl}`);
+  next();
+});
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", CSP);
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  if (IS_PROD) res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   next();
 });
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ extended: false, limit: "20kb", parameterLimit: 50 }));
+// Sin CORS: no se envían cabeceras Access-Control-*, así que solo el propio dominio puede llamar a la API desde un navegador.
+
+// Rate limiting genérico por IP (ventana deslizante en memoria)
+const buckets = new Map();
+function limiter(name, max, windowMs) {
+  return (req, res, next) => {
+    const key = `${name}|${req.ip}`, now = Date.now();
+    const list = (buckets.get(key) || []).filter((t) => now - t < windowMs);
+    if (list.length >= max) {
+      res.setHeader("Retry-After", Math.ceil(windowMs / 1000));
+      return res.status(429).json({ error: "Demasiadas solicitudes. Espera un momento e intenta de nuevo.", answer: "Demasiadas preguntas seguidas. Espera un momento." });
+    }
+    list.push(now); buckets.set(key, list); next();
+  };
+}
+setInterval(() => { const now = Date.now(); for (const [k, l] of buckets) if (!l.some((t) => now - t < 3600e3)) buckets.delete(k); }, 600e3).unref();
+app.use("/api", limiter("api", 600, 10 * 60e3));
+// Validación básica de parámetros: ningún valor de query mayor a 200 caracteres
+app.use("/api", (req, res, next) => { for (const v of Object.values(req.query)) { if ((Array.isArray(v) ? v.join(",") : String(v)).length > 200) return res.status(400).json({ error: "Parámetro demasiado largo" }); } next(); });
+app.use("/api/assistant", limiter("assistant", 30, 10 * 60e3));
+app.use("/api/dist/research", limiter("research", 20, 3600e3));
+app.use("/api/trade/catalog/search", limiter("catalog", 60, 10 * 60e3));
+app.use("/api/mk/bookings", limiter("bookings", 10, 3600e3));
+app.use("/api/mk/apply", limiter("apply", 5, 3600e3));
 
 const requireAuth = (req, res, next) => {
   const s = readToken(req);
@@ -199,6 +253,13 @@ api.post("/assistant", async (req, res) => {
     res.status(500).json({ answer: "Ocurrió un error con el asistente." });
   }
 });
+api.get("/backup", async (req, res, next) => {
+  try {
+    const data = await exportAll();
+    res.setHeader("Content-Disposition", `attachment; filename="respaldo-alex-solutions-${new Date().toISOString().slice(0, 10)}.json"`);
+    res.json({ exportedAt: new Date().toISOString(), collections: data });
+  } catch (e) { next(e); }
+});
 api.post("/refresh", (req, res) => {
   refresh();
   res.json({ ok: true, status });
@@ -216,7 +277,26 @@ app.get("/experto/:slug", page("mk-experto.html"));
 app.get("/reserva/:token", page("mk-reserva.html"));
 app.get("/experto-panel/:token", page("mk-panel.html"));
 
-app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"], maxAge: "5m" }));
-app.use((req, res) => res.status(404).sendFile(path.join(__dirname, "public", "index.html")));
+// Estáticos: HTML/JS/CSS siempre se revalidan (ETag) para que un despliegue nuevo se vea al instante.
+app.use(express.static(path.join(__dirname, "public"), {
+  extensions: ["html"],
+  setHeaders: (res, file) => res.setHeader("Cache-Control", /\.(html|js|css)$/.test(file) ? "no-cache" : "public, max-age=86400"),
+}));
 
-app.listen(PORT, () => console.log(`LicenciaPro escuchando en :${PORT}`));
+// 404 personalizada
+app.use((req, res) => {
+  if (req.originalUrl.startsWith("/api/")) return res.status(404).json({ error: "No encontrado" });
+  res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
+});
+// 500: sin detalles técnicos para el usuario; el detalle va solo al log del servidor
+app.use((err, req, res, next) => {
+  const id = crypto.randomBytes(4).toString("hex");
+  console.error(`[error ${id}] ${req.method} ${req.originalUrl}`, err);
+  if (res.headersSent) return next(err);
+  const status = err.status === 400 || err.type === "entity.too.large" || err.type === "entity.parse.failed" ? (err.status || 400) : 500;
+  if (req.originalUrl.startsWith("/api/")) return res.status(status).json({ error: status === 500 ? `Ocurrió un error interno (ref. ${id}).` : "Solicitud inválida." });
+  res.status(status).sendFile(path.join(__dirname, "public", "500.html"));
+});
+process.on("unhandledRejection", (e) => console.error("[unhandledRejection]", e));
+
+app.listen(PORT, () => console.log(`Alex Solutions escuchando en :${PORT}`));

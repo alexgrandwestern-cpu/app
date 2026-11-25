@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ofrece tus servicios — Alex Solutions Expertos</title>
   <meta name="description" content="Gestores y consultores: publiquen sus servicios de licencias de licor, layout, BASSET y permisos para restaurantes y tiendas de Chicago." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Alex Solutions, Inc" />
+  <meta property="og:title" content="Ofrece tus servicios — Alex Solutions Expertos" />
+  <meta property="og:description" content="Gestores y consultores: publiquen sus servicios de licencias de licor y layout para restaurantes y tiendas de Chicago." />
+  <meta property="og:url" content="https://licenciapro-chicago.onrender.com/unete" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&h=630&q=70" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#7a1f2b" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
@@ -28,35 +36,12 @@
       <h2 style="margin-top:18px">Servicios *</h2>
       <div id="svcs"></div>
       <button type="button" class="btn btn-ghost btn-sm" id="add">+ Agregar servicio</button>
-      <div style="margin-top:20px"><button class="btn btn-primary" type="submit">Enviar solicitud</button></div>
+      <div style="margin-top:20px"><button class="btn btn-primary" type="submit">Enviar solicitud</button><p class="consent">Al enviar aceptas los <a href="/terminos">términos de uso</a> y el <a href="/privacidad">aviso de privacidad</a>.</p></div>
     </form>
   </main>
   <script src="/mk.js"></script>
   <script src="/mk-svc.js"></script>
-  <script>
-    const { esc, api } = MK;
-    MK.chrome();
-    let cats = [];
-    (async () => {
-      const m = await api("/api/mk/meta"); cats = m.categories;
-      document.getElementById("fee").textContent = `La plataforma cobra una comisión del ${m.feePct}% sobre los servicios completados.`;
-      SVC.mount(document.getElementById("svcs"), cats, [{}]);
-    })();
-    document.getElementById("add").addEventListener("click", () => SVC.add(document.getElementById("svcs"), cats, {}));
-    document.getElementById("af").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target));
-      data.services = SVC.read(document.getElementById("svcs"));
-      try {
-        const r = await api("/api/mk/apply", { method: "POST", body: JSON.stringify(data) });
-        const url = location.origin + r.link;
-        e.target.remove();
-        document.getElementById("done").innerHTML = `<div class="msg-ok"><b>¡Solicitud recibida!</b> Este es tu <b>enlace privado</b> para administrar tu perfil y tus reservas. Guárdalo: es tu llave de acceso.
-          <div class="linkbox"><input readonly value="${esc(url)}" id="lnk"><button class="btn btn-ghost btn-sm" id="cp">Copiar</button><a class="btn btn-primary btn-sm" href="${esc(r.link)}">Abrir mi panel</a></div></div>`;
-        document.getElementById("cp").addEventListener("click", () => navigator.clipboard?.writeText(url).then(() => (document.getElementById("cp").textContent = "¡Copiado!")));
-      } catch (err) { document.getElementById("err").innerHTML = `<div class="msg-err">${esc(err.message)}</div>`; window.scrollTo(0, 0); }
-    });
-  </script>
+  <script src="/js/unete.js"></script>
   <script src="/i18n.js"></script>
 </body>
 </html>

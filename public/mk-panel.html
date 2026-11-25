@@ -15,63 +15,7 @@
   <main class="container page" id="root"><div class="empty">Cargando…</div></main>
   <script src="/mk.js"></script>
   <script src="/mk-svc.js"></script>
-  <script>
-    const { esc, money, api, date, STATUS } = MK;
-    MK.chrome();
-    const tok = location.pathname.split("/").pop();
-    const base = `/api/mk/manage/${encodeURIComponent(tok)}`;
-    async function load() {
-      let d;
-      try { d = await api(base); } catch { document.getElementById("root").innerHTML = '<div class="empty">Enlace inválido.</div>'; return; }
-      const e = d.expert, bks = d.bookings;
-      const done = bks.filter((b) => b.status === "completed");
-      const earned = done.reduce((a, b) => a + (b.price || 0) - (b.fee || 0), 0);
-      const avg = d.reviews.length ? (d.reviews.reduce((a, r) => a + r.rating, 0) / d.reviews.length).toFixed(2) : "—";
-      document.getElementById("root").innerHTML = `
-        <h1>Hola, ${esc(e.name.split(" ")[0])} 👋</h1>
-        ${{ pending: '<div class="msg-err" style="background:#fdf3dc;color:#8a5a00">⏳ Tu perfil está en revisión. Alex lo aprobará pronto; mientras, puedes completarlo.</div>', rejected: '<div class="msg-err">Tu solicitud no fue aprobada.</div>', paused: '<div class="msg-err">Tu perfil está pausado y no aparece en búsquedas.</div>', approved: `<div class="msg-ok">✅ Tu perfil está publicado: <a href="/experto/${esc(e.slug)}" target="_blank">ver mi perfil público →</a></div>` }[e.status] || ""}
-        <div class="kpis-mk">
-          <div class="kpi"><div class="v">${bks.filter((b) => b.status === "requested").length}</div><div class="l">solicitudes nuevas</div></div>
-          <div class="kpi"><div class="v">${bks.filter((b) => b.status === "accepted").length}</div><div class="l">en curso</div></div>
-          <div class="kpi"><div class="v">${money(earned)}</div><div class="l">ganado (neto, después del ${d.feePct}%)</div></div>
-          <div class="kpi"><div class="v">★ ${avg}</div><div class="l">${d.reviews.length} reseñas</div></div>
-        </div>
-        <div class="panel"><h2>Reservas</h2>${bks.length ? bks.map((b) => `
-          <div class="bk"><div class="bk-top"><b>${esc(b.business)} · ${esc(b.serviceName)}</b><span class="st st-${b.status}">${STATUS[b.status]}</span></div>
-            <div style="color:var(--muted);font-size:14px">${esc(b.contactName)} · <a href="mailto:${esc(b.email)}">${esc(b.email)}</a>${b.phone ? ` · <a href="tel:${esc(b.phone)}">${esc(b.phone)}</a>` : ""}${b.address ? " · " + esc(b.address) : ""}</div>
-            <div style="font-size:14px">📅 ${esc(b.date || "Fecha flexible")} · 💵 ${b.price != null ? money(b.price) + ` (comisión ${money(b.fee || 0)})` : "Por cotizar"} · Solicitada ${date(b.createdAt)}</div>
-            ${b.message ? `<div style="font-size:14px;background:var(--surface-2);padding:8px 10px;border-radius:10px">${esc(b.message)}</div>` : ""}
-            <div class="acts">
-              ${b.status === "requested" ? `<input type="number" min="0" placeholder="Precio final USD" data-price="${b.id}" style="width:150px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)"><button class="btn btn-primary btn-sm" data-act="accept" data-id="${b.id}">Aceptar</button><button class="btn btn-ghost btn-sm" data-act="decline" data-id="${b.id}">Rechazar</button>` : ""}
-              ${b.status === "accepted" ? `<button class="btn btn-primary btn-sm" data-act="complete" data-id="${b.id}">Marcar como completada</button>` : ""}
-            </div></div>`).join("") : '<p style="color:var(--muted)">Aún no tienes reservas.</p>'}</div>
-        <form class="panel form" id="pf"><h2>Mi perfil</h2><div id="perr"></div>
-          <div class="f2"><div class="f"><label>Nombre</label><input name="name" value="${esc(e.name)}" required /></div><div class="f"><label>Correo (visible al aceptar)</label><input name="email" value="${esc(e.email)}" /></div></div>
-          <div class="f2"><div class="f"><label>Teléfono (visible al aceptar)</label><input name="phone" value="${esc(e.phone)}" /></div><div class="f"><label>Años de experiencia</label><input type="number" name="yearsExp" value="${e.yearsExp ?? ""}" /></div></div>
-          <div class="f"><label>Titular</label><input name="headline" value="${esc(e.headline)}" /></div>
-          <div class="f"><label>Acerca de</label><textarea name="bio" rows="4">${esc(e.bio)}</textarea></div>
-          <div class="f2"><div class="f"><label>Zonas</label><input name="areas" value="${esc(e.areas.join(", "))}" /></div><div class="f"><label>Idiomas</label><input name="languages" value="${esc(e.languages.join(", "))}" /></div></div>
-          <div class="f"><label>Foto (URL https)</label><input name="photo" value="${esc(e.photo)}" /></div>
-          <h2 style="margin-top:16px">Servicios</h2><div id="svcs"></div>
-          <button type="button" class="btn btn-ghost btn-sm" id="add">+ Agregar servicio</button>
-          <div style="margin-top:16px"><button class="btn btn-primary" type="submit">Guardar perfil</button></div>
-        </form>`;
-      SVC.mount(document.getElementById("svcs"), d.categories, e.services);
-      document.getElementById("add").addEventListener("click", () => SVC.add(document.getElementById("svcs"), d.categories, {}));
-      document.querySelectorAll("[data-act]").forEach((b) => b.addEventListener("click", async () => {
-        const price = document.querySelector(`[data-price="${b.dataset.id}"]`)?.value ?? "";
-        try { await api(`${base}/booking/${b.dataset.id}`, { method: "POST", body: JSON.stringify({ action: b.dataset.act, price }) }); load(); } catch (err) { alert(err.message); }
-      }));
-      document.getElementById("pf").addEventListener("submit", async (ev) => {
-        ev.preventDefault();
-        const data = Object.fromEntries(new FormData(ev.target));
-        data.services = SVC.read(document.getElementById("svcs"));
-        try { await api(`${base}/profile`, { method: "PUT", body: JSON.stringify(data) }); document.getElementById("perr").innerHTML = '<div class="msg-ok">Perfil guardado ✓</div>'; }
-        catch (err) { document.getElementById("perr").innerHTML = `<div class="msg-err">${esc(err.message)}</div>`; }
-      });
-    }
-    load();
-  </script>
+  <script src="/js/mk-panel.js"></script>
   <script src="/i18n.js"></script>
 </body>
 </html>

@@ -569,8 +569,24 @@ $$(".tab").forEach((t) => t.addEventListener("click", () => {
 }));
 function refreshTab() {
   const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: async () => { await loadDist(); await loadNetwork(); }, radar: loadRadar, catalog: loadCatalog }[state.tab];
-  run().catch((e) => console.error(e));
+  run().then(hideError).catch((e) => { console.error(e); showError(); });
 }
+// Mensaje de error visible con opción de reintentar
+function showError(msg = "Hubo un problema al cargar los datos. Revisa tu conexión e intenta de nuevo.") {
+  let el = $("#app-error");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "app-error"; el.className = "app-error"; el.setAttribute("role", "alert");
+    $(".main").prepend(el);
+  }
+  el.innerHTML = `<span>⚠️ ${esc(msg)}</span><button class="btn btn-ghost btn-sm" type="button">Reintentar</button>`;
+  el.querySelector("button").addEventListener("click", () => { hideError(); refreshTab(); });
+}
+function hideError() { $("#app-error")?.remove(); }
+// Teclado: las filas y tarjetas clicables se pueden enfocar con Tab y abrir con Enter
+const CLICKABLE = "tr[data-id], .topitem[data-id], .kcard[data-id], .bar[data-v], #tbl-areas tr[data-v]";
+new MutationObserver(() => $$(CLICKABLE).forEach((el) => { if (!el.hasAttribute("tabindex")) { el.tabIndex = 0; el.setAttribute("role", "button"); } })).observe(document.body, { childList: true, subtree: true });
+document.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(CLICKABLE)) { e.preventDefault(); e.target.click(); } });
 function refreshAll() {
   refreshTab();
   if (state.tab !== "list") api(`/api/prospects?${params({ limit: 1 })}`).then((d) => ($("#count-list").textContent = fmt(d.total))).catch(() => {});
@@ -615,7 +631,9 @@ $$("#ai-suggest button").forEach((b) => b.addEventListener("click", () => send(b
 // ---------- Inicio ----------
 (async function init() {
   bindFilters(); renderPipeline();
-  await waitForData();
-  await loadFacets();
-  refreshAll();
+  try {
+    await waitForData();
+    await loadFacets();
+    refreshAll();
+  } catch (e) { if (e.message !== "auth") { console.error(e); showError(); } }
 })();

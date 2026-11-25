@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Expertos en licencias de licor — Alex Solutions</title>
   <meta name="description" content="Encuentra y reserva expertos en licencias de licor, layout de tiendas, BASSET y permisos en Chicago. Reseñas verificadas." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Alex Solutions, Inc" />
+  <meta property="og:title" content="Expertos en licencias de licor en Chicago — Alex Solutions" />
+  <meta property="og:description" content="Encuentra y reserva expertos verificados en licencias de licor, layout, BASSET y permisos en Chicago." />
+  <meta property="og:url" content="https://licenciapro-chicago.onrender.com/expertos" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&h=630&q=70" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#7a1f2b" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
@@ -31,42 +39,7 @@
     </section>
   </main>
   <script src="/mk.js"></script>
-  <script>
-    const { esc, stars, money, initials, CAT_ICON, api } = MK;
-    MK.chrome();
-    let state = { category: "", area: "", q: "" };
-    async function load() {
-      const p = new URLSearchParams(Object.entries(state).filter(([, v]) => v));
-      const list = await api(`/api/mk/experts?${p}`);
-      document.getElementById("grid").innerHTML = list.map((e) => `
-        <a class="xcard" href="/experto/${esc(e.slug)}">
-          <div class="img">${e.photo ? `<img src="${esc(e.photo)}" alt="${esc(e.name)}" loading="lazy">` : `<span class="initials">${esc(initials(e.name))}</span>`}
-            ${e.featured ? '<span class="badge">🏅 Experto destacado</span>' : ""}</div>
-          <div class="row"><span>${esc(e.name)}</span><span class="stars">${stars(e.rating, e.reviewsCount)}</span></div>
-          <div class="sub">${esc(e.headline)}</div>
-          <div class="sub">${e.categories.map((c) => CAT_ICON[c] || "").join(" ")} ${esc(e.areas.slice(0, 2).join(" · "))}</div>
-          <div class="price">${e.minPrice != null ? `<b>Desde ${money(e.minPrice)}</b>` : "<b>Cotización gratis</b>"}</div>
-        </a>`).join("") || `<div class="empty" style="grid-column:1/-1">No hay expertos con esos filtros todavía. <a href="/unete">¿Quieres ser el primero?</a></div>`;
-    }
-    (async () => {
-      const meta = await api("/api/mk/meta");
-      document.getElementById("s-cat").innerHTML += meta.categories.map((c) => `<option>${esc(c)}</option>`).join("");
-      document.getElementById("cats").innerHTML = [["", "✨", "Todos"], ...meta.categories.map((c) => [c, CAT_ICON[c], c])].map(([v, i, l]) => `<button data-v="${esc(v)}" class="${v === "" ? "on" : ""}"><span>${i}</span>${esc(l)}</button>`).join("");
-      document.querySelectorAll("#cats button").forEach((b) => b.addEventListener("click", () => {
-        document.querySelectorAll("#cats button").forEach((x) => x.classList.toggle("on", x === b));
-        state.category = b.dataset.v; document.getElementById("s-cat").value = b.dataset.v; load();
-      }));
-      const qs = new URLSearchParams(location.search);
-      if (qs.get("category")) { state.category = qs.get("category"); document.getElementById("s-cat").value = state.category; }
-      load();
-    })();
-    document.getElementById("sf").addEventListener("submit", (e) => {
-      e.preventDefault();
-      state = { category: document.getElementById("s-cat").value, area: document.getElementById("s-area").value.trim(), q: document.getElementById("s-q").value.trim() };
-      document.querySelectorAll("#cats button").forEach((x) => x.classList.toggle("on", x.dataset.v === state.category));
-      load();
-    });
-  </script>
+  <script src="/js/expertos.js"></script>
   <script src="/i18n.js"></script>
 </body>
 </html>

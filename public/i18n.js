@@ -391,6 +391,9 @@
   };
 
   const P = [
+    [/^(Fecha por definir|\d{4}-\d{2}-\d{2})( · \d{2}:\d{2})? · (\d+) h( · (.+))?$/, (m, d, tm, h, x, lvl) => `${d === "Fecha por definir" ? "Date to be confirmed" : d}${tm || ""} · ${h} h${lvl ? " · " + t(lvl) : ""}`],
+    [/^(\d+) bebidas · (\d+) cervezas · (\d+) (?:botellas de vino|vinos) · (\d+) (?:botellas de licor|licores)$/, "$1 drinks · $2 beers · $3 bottles of wine · $4 bottles of spirits"],
+    [/^Por definir$/, "To be confirmed"], [/^Válida hasta (.+)$/, "Valid until $1"],
     [/^Desde \$([\d,]+) por persona$/, (m, n) => `From $${n} per person`], [/^Elegir (.+)$/, (m, x) => `Choose ${t(x)}`], [/^(.+) · (\d+) invitados$/, (m, a, n) => `${t(a)} · ${n} guests`], [/^(\d+) invitados · (\d+) h$/, "$1 guests · $2 h"],
     [/^(\d+) productos$/, "$1 products"], [/^Cantidad de (.+)$/, "Quantity of $1"], [/^Enviada (.+?)( · válida hasta (.+))?$/, (m, d, x, v) => `Sent ${d}${v ? ` · valid until ${v}` : ""}`],
     [/^Aún no hay solicitudes\. Comparte tu página$/, "No requests yet. Share your page"], [/^con tus clientes\.$/, "with your clients."],

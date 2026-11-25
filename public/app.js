@@ -139,7 +139,7 @@ async function loadMap() {
   if (!window.L) { $("#map").innerHTML = '<p class="muted" style="padding:20px">No se pudo cargar el mapa.</p>'; return; }
   if (!map) {
     map = L.map("map", { preferCanvas: true }).setView([41.8781, -87.6798], 11);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution: "© OpenStreetMap · © CARTO", maxZoom: 19 }).addTo(map);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>", maxZoom: 19 }).addTo(map);
   }
   setTimeout(() => map.invalidateSize(), 50);
   const pts = await api(`/api/map?${params()}`);
@@ -305,7 +305,7 @@ async function loadNetwork() {
   $("#net-meta").textContent = d.permitsAt ? `· ${fmt(d.total)} empresas con permiso federal de mayorista (TTB, ${new Date(d.permitsAt).toLocaleDateString("es-MX")})` : "· descargando datos de la TTB…";
   if (window.L && !netMap) {
     netMap = L.map("net-map", { preferCanvas: true }).setView([41.88, -87.9], 9);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution: "© OpenStreetMap · © CARTO", maxZoom: 19 }).addTo(netMap);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>", maxZoom: 19 }).addTo(netMap);
   }
   setTimeout(() => netMap?.invalidateSize(), 50);
   renderNetwork();
@@ -569,7 +569,7 @@ $$(".tab").forEach((t) => t.addEventListener("click", () => {
 }));
 function refreshTab() {
   const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: async () => { await loadDist(); await loadNetwork(); }, radar: loadRadar, catalog: loadCatalog }[state.tab];
-  run().then(hideError).catch((e) => { console.error(e); showError(); });
+  run().then(hideError).catch((e) => { if (e.message === "loading") { $("#loading").classList.add("show"); waitForData().then(() => refreshTab()); return; } console.error(e); showError(); });
 }
 // Mensaje de error visible con opción de reintentar
 function showError(msg = "Hubo un problema al cargar los datos. Revisa tu conexión e intenta de nuevo.") {

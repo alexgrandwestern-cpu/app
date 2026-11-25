@@ -378,6 +378,7 @@ async function openProduct(id) {
       <div class="d-section actions">
         <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="${esc(d.colaUrl)}">📄 Ver etiqueta en TTB</a>
         <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://www.google.com/search?q=${encodeURIComponent(`${p.brand} ${p.fanciful} ${p.supplier}`)}">🔎 Buscar en Google</a>
+      </div><div class="d-section"><h4>Buscar precio y disponibilidad</h4><div class="small">${shopLinks(`${p.brand} ${p.fanciful}`)} · <a href="https://www.wine-searcher.com/find/${encodeURIComponent(`${p.brand} ${p.fanciful}`)}/1/usa-il" target="_blank" rel="noopener">Wine-Searcher (IL)</a></div>
       </div>
     </div>`;
   $("#d-close").addEventListener("click", closeDrawer);
@@ -387,6 +388,76 @@ async function openProduct(id) {
     catch (err) { b.disabled = false; b.textContent = "🔍 Investigar distribuidor"; alert(err.message); }
   });
   $("#drawer").classList.add("show"); $("#drawer-bg").classList.add("show"); $("#drawer").scrollTop = 0;
+}
+
+// ---------- Catálogo de productos del mercado ----------
+const catState = { cat: "liquors", bound: false, mixerTypes: [] };
+const CAT_LABEL = { liquors: "licores", wines: "vinos", beers: "cervezas", mixers: "mixers y suministros de bar" };
+function shopLinks(name) {
+  const q = encodeURIComponent(name);
+  return `<a href="https://www.google.com/search?tbm=shop&q=${q}" target="_blank" rel="noopener">Google Shopping</a> · <a href="https://www.webstaurantstore.com/search/${q}.html" target="_blank" rel="noopener">WebstaurantStore</a> · <a href="https://www.amazon.com/s?k=${q}" target="_blank" rel="noopener">Amazon</a>`;
+}
+function catOwnHtml(own) {
+  const isMix = catState.cat === "mixers";
+  return `<div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">${isMix ? "Mi catálogo de mixers y suministros" : "Mis productos guardados"}</h3><button class="btn btn-ghost btn-sm" id="cat-add">+ Agregar producto</button></div>
+    ${own.length ? `<div class="table-wrap"><table class="tbl"><thead><tr><th>Producto</th><th>Tipo</th><th>Proveedor / distribuidor</th><th class="num">Precio</th><th></th></tr></thead><tbody>${own.map((p) => `<tr>
+      <td class="biz">${esc(p.name)}<small>${esc([p.brand, p.size].filter(Boolean).join(" · "))}${p.notes ? " · " + esc(p.notes) : ""}</small></td><td>${esc(p.type || "—")}</td>
+      <td>${esc(p.supplier || "—")}${p.url ? `<br><a class="small" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Ver producto ↗</a>` : ""}</td><td class="num">${esc(p.price || "—")}</td>
+      <td><div class="actions"><button class="btn btn-ghost btn-sm" data-ce="${esc(p.id)}">✏️</button><button class="btn btn-ghost btn-sm" data-cd="${esc(p.id)}">✕</button></div></td></tr>`).join("")}</tbody></table></div>`
+      : `<p class="muted" style="margin:0">${isMix ? "Aún no hay productos. Agrega los mixers, jarabes, cristalería y herramientas que vendes o recomiendas." : "Guarda aquí productos que vendes o recomiendas, con su proveedor y precio."}</p>`}
+    <div id="cat-edit"></div></div>`;
+}
+function catEditForm(p = {}) {
+  const isMix = catState.cat === "mixers";
+  return `<form id="cat-edit-form" style="margin-top:14px;border-top:1px solid var(--line);padding-top:14px">
+    <div class="frow"><div class="fgroup"><label>Producto</label><input name="name" class="inp" required value="${esc(p.name || "")}"></div><div class="fgroup"><label>Marca</label><input name="brand" class="inp" value="${esc(p.brand || "")}"></div></div>
+    <div class="frow"><div class="fgroup"><label>Tipo</label>${isMix ? `<select name="type" class="inp">${catState.mixerTypes.map((t) => `<option ${t === p.type ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>` : `<input name="type" class="inp" value="${esc(p.type || "")}">`}</div><div class="fgroup"><label>Tamaño / presentación</label><input name="size" class="inp" value="${esc(p.size || "")}" placeholder="Ej.: 750 ml, caja de 24"></div></div>
+    <div class="frow"><div class="fgroup"><label>Proveedor / distribuidor</label><input name="supplier" class="inp" value="${esc(p.supplier || "")}"></div><div class="fgroup"><label>Precio</label><input name="price" class="inp" value="${esc(p.price || "")}" placeholder="Ej.: $12.50"></div></div>
+    <div class="fgroup"><label>Enlace (https)</label><input name="url" class="inp" value="${esc(p.url || "")}"></div>
+    <div class="fgroup"><label>Notas</label><input name="notes" class="inp" value="${esc(p.notes || "")}"></div>
+    <div class="actions"><button class="btn btn-primary btn-sm">Guardar</button><button type="button" class="btn btn-ghost btn-sm" id="cat-cancel">Cancelar</button></div></form>`;
+}
+async function loadCatalog(ev) {
+  ev?.preventDefault?.();
+  if (!catState.bound) {
+    catState.bound = true;
+    catState.mixerTypes = (await api("/api/trade/catalog/meta")).mixerTypes;
+    $("#cat-form").addEventListener("submit", loadCatalog);
+    $$("#cat-tabs .chip").forEach((c) => c.addEventListener("click", () => { catState.cat = c.dataset.c; $$("#cat-tabs .chip").forEach((x) => x.classList.toggle("on", x === c)); loadCatalog(); }));
+  }
+  const q = $("#cat-q").value.trim(), isMix = catState.cat === "mixers";
+  $("#cat-status").textContent = q.length >= 2 && !isMix ? "Buscando en el registro de la TTB…" : "";
+  let d;
+  try { d = await api(`/api/trade/catalog/search?cat=${catState.cat}&q=${encodeURIComponent(q)}`); }
+  catch (err) { $("#cat-status").textContent = err.message; return; }
+  $("#cat-own").innerHTML = catOwnHtml(d.own);
+  $("#cat-add").addEventListener("click", () => openCatEdit({}));
+  $$("#cat-own [data-ce]").forEach((b) => b.addEventListener("click", () => openCatEdit(d.own.find((p) => p.id === b.dataset.ce))));
+  $$("#cat-own [data-cd]").forEach((b) => b.addEventListener("click", async () => { if (!confirm("¿Eliminar este producto del catálogo?")) return; await api(`/api/trade/catalog/${b.dataset.cd}`, { method: "DELETE" }); loadCatalog(); }));
+  const tbl = $("#cat-tbl").closest(".card");
+  if (isMix) {
+    tbl.style.display = q ? "" : "none";
+    $("#cat-tbl tbody").innerHTML = q ? `<tr><td colspan="5" style="padding:16px">Buscar "<b>${esc(q)}</b>" en proveedores: ${shopLinks(q)}</td></tr>` : "";
+    $("#cat-status").textContent = q ? "" : "Los mixers y suministros no tienen registro público: arma aquí tu catálogo y busca precios en proveedores.";
+    return;
+  }
+  tbl.style.display = "";
+  $("#cat-status").innerHTML = d.source === "ttb" ? `${fmt(d.items.length)} ${CAT_LABEL[catState.cat]} encontrados en la TTB${d.totalAll > d.items.length ? ` (de ${fmt(d.totalAll)} productos con ese nombre en todas las categorías)` : ""}. Clic en uno para ver distribuidor y cuentas.` : `Mostrando los ${CAT_LABEL[catState.cat]} más recientes del radar. Escribe una marca para buscar en todo el registro.`;
+  $("#cat-tbl tbody").innerHTML = d.items.map((x) => `<tr data-id="${esc(x.id)}"><td class="biz">${esc(x.brand)}<small>${esc(x.fanciful)}</small></td>
+    <td class="hide-sm">${esc(x.group)}<br><span class="muted small">${esc(x.classDesc)}</span></td><td class="hide-md">${esc(x.origin)}</td>
+    <td class="hide-sm">${x.supplier ? esc(x.supplier) : `<span class="muted small">Permiso ${esc(x.permit)}</span>`}</td><td>${esc(x.date)}</td></tr>`).join("")
+    || `<tr><td colspan="5" class="muted" style="text-align:center;padding:24px">Sin resultados. Prueba con otra marca o revisa la ortografía.</td></tr>`;
+  $$("#cat-tbl tbody tr[data-id]").forEach((tr) => tr.addEventListener("click", () => openProduct(tr.dataset.id)));
+}
+function openCatEdit(p) {
+  $("#cat-edit").innerHTML = catEditForm(p);
+  $("#cat-cancel").addEventListener("click", () => ($("#cat-edit").innerHTML = ""));
+  $("#cat-edit-form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const body = { ...Object.fromEntries(new FormData(ev.target)), cat: catState.cat, id: p.id };
+    try { await api("/api/trade/catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); loadCatalog(); }
+    catch (err) { alert(err.message); }
+  });
 }
 
 // ---------- Ficha ----------
@@ -497,7 +568,7 @@ $$(".tab").forEach((t) => t.addEventListener("click", () => {
   refreshTab();
 }));
 function refreshTab() {
-  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: async () => { await loadDist(); await loadNetwork(); }, radar: loadRadar }[state.tab];
+  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: async () => { await loadDist(); await loadNetwork(); }, radar: loadRadar, catalog: loadCatalog }[state.tab];
   run().catch((e) => console.error(e));
 }
 function refreshAll() {

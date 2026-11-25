@@ -56,6 +56,7 @@
         <button class="tab" data-tab="map">Mapa</button>
         <button class="tab" data-tab="pipeline">Pipeline <span class="count" id="count-pipe"></span></button>
         <button class="tab" data-tab="market">Marketplace <span class="count" id="count-mk"></span></button>
+        <button class="tab" data-tab="catalog">Productos</button>
         <button class="tab" data-tab="radar">Radar de productos</button>
         <button class="tab" data-tab="dist">Distribuidores</button>
       </nav>
@@ -94,6 +95,17 @@
       <section class="tabpane" id="tab-pipeline">
         <p class="muted">Tu pipeline se guarda en este navegador. Cambia el estado desde la ficha de cada prospecto.</p>
         <div class="kanban" id="kanban"></div>
+      </section>
+
+      <section class="tabpane" id="tab-catalog">
+        <div class="card"><h3>Buscador de productos del mercado</h3>
+          <p class="muted small" style="margin:-8px 0 12px">Licores, vinos y cervezas: búsqueda en vivo en el registro federal de etiquetas de la TTB (todo lo aprobado para venderse en EE. UU. en los últimos 6 años). Mixers y suministros de bar: tu propio catálogo.</p>
+          <div class="cat-tabs" id="cat-tabs"><button class="chip on" data-c="liquors">🥃 Licores</button><button class="chip" data-c="wines">🍷 Vinos</button><button class="chip" data-c="beers">🍺 Cervezas</button><button class="chip" data-c="mixers">🍋 Mixers y suministros de bar</button></div>
+          <form id="cat-form" class="dist-search" style="margin-top:12px"><input id="cat-q" placeholder="Busca por marca o nombre del producto…" autocomplete="off" /><button class="btn btn-primary">Buscar</button></form>
+          <div id="cat-status" class="muted small" style="margin-top:8px"></div>
+        </div>
+        <div id="cat-own"></div>
+        <div class="table-wrap card flush"><table class="tbl hover" id="cat-tbl"><thead><tr><th>Marca · producto</th><th class="hide-sm">Tipo</th><th class="hide-md">Origen</th><th class="hide-sm">Importador / proveedor</th><th>Aprobada</th></tr></thead><tbody></tbody></table></div>
       </section>
 
       <section class="tabpane" id="tab-radar">

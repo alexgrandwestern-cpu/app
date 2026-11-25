@@ -126,6 +126,19 @@
     "📄 Ver etiqueta en TTB": "📄 View label on TTB", "🔎 Buscar en Google": "🔎 Search on Google",
 
     // ---------- Datos ----------
+    "Productos": "Products", "Buscador de productos del mercado": "Market product search", "🥃 Licores": "🥃 Liquors", "🍷 Vinos": "🍷 Wines", "🍺 Cervezas": "🍺 Beers",
+    "🍋 Mixers y suministros de bar": "🍋 Mixers & bar supplies", "Busca por marca o nombre del producto…": "Search by brand or product name…", "Aprobada": "Approved",
+    "Licores, vinos y cervezas: búsqueda en vivo en el registro federal de etiquetas de la TTB (todo lo aprobado para venderse en EE. UU. en los últimos 6 años). Mixers y suministros de bar: tu propio catálogo.": "Liquors, wines and beers: live search of the TTB federal label registry (everything approved for sale in the U.S. in the last 6 years). Mixers & bar supplies: your own catalog.",
+    "Mi catálogo de mixers y suministros": "My mixers & supplies catalog", "Mis productos guardados": "My saved products", "+ Agregar producto": "+ Add product", "Producto": "Product",
+    "Proveedor / distribuidor": "Supplier / distributor", "Ver producto ↗": "View product ↗", "Tamaño / presentación": "Size / pack", "Ej.: 750 ml, caja de 24": "E.g.: 750 ml, case of 24",
+    "Ej.: $12.50": "E.g.: $12.50", "Enlace (https)": "Link (https)", "Notas": "Notes", "Buscando en el registro de la TTB…": "Searching the TTB registry…",
+    "Aún no hay productos. Agrega los mixers, jarabes, cristalería y herramientas que vendes o recomiendas.": "No products yet. Add the mixers, syrups, glassware and tools you sell or recommend.",
+    "Guarda aquí productos que vendes o recomiendas, con su proveedor y precio.": "Save products you sell or recommend here, with their supplier and price.",
+    "Los mixers y suministros no tienen registro público: arma aquí tu catálogo y busca precios en proveedores.": "Mixers and supplies have no public registry: build your catalog here and look up prices with suppliers.",
+    "Sin resultados. Prueba con otra marca o revisa la ortografía.": "No results. Try another brand or check the spelling.", "Buscar precio y disponibilidad": "Find price and availability",
+    "Mixer / refresco": "Mixer / soda", "Jarabe / sirope": "Syrup", "Bitters": "Bitters", "Garnish / fruta": "Garnish / fruit", "Cristalería": "Glassware", "Herramientas de bar": "Bar tools",
+    "Desechables": "Disposables", "Hielo": "Ice", "El registro de la TTB no respondió. Intenta de nuevo en un momento.": "The TTB registry didn't respond. Try again in a moment.",
+    "¿Eliminar este producto del catálogo?": "Delete this product from the catalog?",
     "Restaurante con comedor": "Restaurant with dining room", "Café y bebidas": "Café and drinks", "Panadería / Deli": "Bakery / Deli", "Comida para llevar": "Takeout",
     "Tienda / Grocery": "Store / Grocery", "Otro alimento": "Other food", "Institucional": "Institutional",
     "Mexicana": "Mexican", "Italiana / Pizza": "Italian / Pizza", "Asiática": "Asian", "Steak / Grill / BBQ": "Steak / Grill / BBQ", "Mediterránea / Medio Oriente": "Mediterranean / Middle Eastern",
@@ -325,6 +338,9 @@
   };
 
   const P = [
+    [/^([\d,]+) (licores|vinos|cervezas) encontrados en la TTB(?: \(de ([\d,]+) productos con ese nombre en todas las categorías\))?\. Clic en uno para ver distribuidor y cuentas\.$/, (m, n, c, all) => `${n} ${{ licores: "liquors", vinos: "wines", cervezas: "beers" }[c]} found in the TTB registry${all ? ` (of ${all} products with that name across all categories)` : ""}. Click one to see distributor and accounts.`],
+    [/^Mostrando los (licores|vinos|cervezas) más recientes del radar\. Escribe una marca para buscar en todo el registro\.$/, (m, c) => `Showing the most recent ${{ licores: "liquors", vinos: "wines", cervezas: "beers" }[c]} from the radar. Type a brand to search the whole registry.`],
+    [/^Buscar "(.+)" en proveedores:$/, 'Search "$1" with suppliers:'],
     [/^Página (\d+) de ([\d,]+)$/, "Page $1 of $2"], [/^([\d,]+) prospectos encontrados$/, "$1 prospects found"],
     [/^([\d,]+) productos · página (\d+) de ([\d,]+)$/, "$1 products · page $2 of $3"], [/^Cocina (.+): alta afinidad con bebidas$/, (m, c) => `${t(c)} cuisine: high drink affinity`],
     [/^Datos: (.+?)( · actualizando…)?$/, (m, d, u) => `Data: ${d}${u ? " · updating…" : ""}`], [/^licencias activas analizadas \(([\d,]+) ubicaciones\)$/, "active licenses analyzed ($1 locations)"],

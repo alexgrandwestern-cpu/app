@@ -360,13 +360,13 @@
 
   const ATTRS = ["placeholder", "title", "aria-label", "alt"];
   function walk(root) {
-    if (root.nodeType === 3) { const v = t(root.nodeValue); if (v !== root.nodeValue) root.nodeValue = v; return; }
+    if (root.nodeType === 3) { if (root.parentElement?.closest("[data-noi18n]")) return; const v = t(root.nodeValue); if (v !== root.nodeValue) root.nodeValue = v; return; }
     if (root.nodeType !== 1 || root.tagName === "SCRIPT" || root.tagName === "STYLE" || root.closest?.("[data-noi18n]")) return;
     for (const a of ATTRS) if (root.hasAttribute?.(a)) { const v = t(root.getAttribute(a)); if (v !== root.getAttribute(a)) root.setAttribute(a, v); }
     if (root.tagName === "INPUT" && /^(button|submit)$/i.test(root.type) && root.value) root.value = t(root.value);
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
     let n; while ((n = w.nextNode())) {
-      if (n.nodeType === 3) { const p = n.parentElement; if (p && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.tagName)) { const v = t(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; } }
+      if (n.nodeType === 3) { const p = n.parentElement; if (p && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.tagName) && !p.closest("[data-noi18n]")) { const v = t(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; } }
       else for (const a of ATTRS) if (n.hasAttribute(a)) { const v = t(n.getAttribute(a)); if (v !== n.getAttribute(a)) n.setAttribute(a, v); }
     }
   }

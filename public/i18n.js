@@ -126,6 +126,7 @@
     "📄 Ver etiqueta en TTB": "📄 View label on TTB", "🔎 Buscar en Google": "🔎 Search on Google",
 
     // ---------- Datos ----------
+    "ℹ️ La investigación con IA se activa al agregar": "ℹ️ AI research turns on once you add", "en Render. Mientras, busca en tu directorio o agrega marcas manualmente.": "in Render. Meanwhile, search your directory or add brands manually.",
     "Marca a buscar": "Brand to search", "Filtrar distribuidores": "Filter distributors", "Buscar en el radar": "Search the radar", "Periodo": "Period", "Buscar producto": "Search product", "Pregunta para el asistente": "Question for the assistant",
     "Página no encontrada — Alex Solutions, Inc": "Page not found — Alex Solutions, Inc", "No encontramos esta página": "We couldn't find this page",
     "Puede que el enlace esté mal escrito o que la página ya no exista.": "The link may be mistyped or the page may no longer exist.",

@@ -3,6 +3,7 @@
       ["/", "Página principal", "La página pública de Alex Solutions, Inc"],
       ["/expertos", "Marketplace", "Buscar y reservar expertos"],
       ["/contacto", "Mi tarjeta", "Tarjeta de contacto para compartir"],
+  ["/eventos", "Eventos", "Planificación de eventos con servicio de bar"],
     ];
     document.getElementById("grid").innerHTML = items.map(([p, t, d, main]) => {
       const url = location.origin + p;

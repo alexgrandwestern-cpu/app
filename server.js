@@ -10,6 +10,7 @@ import { marketplaceRouter } from "./lib/marketplace.js";
 import { distributorsRouter } from "./lib/distributors.js";
 import { tradeRouter, syncTrade } from "./lib/trade.js";
 import { exportAll } from "./lib/db.js";
+import { eventsRouter } from "./lib/events.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -136,6 +137,7 @@ app.use("/api/dist/research", limiter("research", 20, 3600e3));
 app.use("/api/trade/catalog/search", limiter("catalog", 60, 10 * 60e3));
 app.use("/api/mk/bookings", limiter("bookings", 10, 3600e3));
 app.use("/api/mk/apply", limiter("apply", 5, 3600e3));
+app.use("/api/ev/requests", limiter("events", 10, 3600e3));
 
 const requireAuth = (req, res, next) => {
   const s = readToken(req);
@@ -265,6 +267,7 @@ api.post("/refresh", (req, res) => {
   res.json({ ok: true, status });
 });
 app.use("/api/mk", marketplaceRouter(requireAuth));
+app.use("/api/ev", eventsRouter(requireAuth));
 app.use("/api/dist", distributorsRouter(requireAuth));
 app.use("/api/trade", tradeRouter(requireAuth, () => ds));
 setTimeout(syncTrade, 15000);
@@ -276,6 +279,7 @@ const page = (f) => (req, res) => res.sendFile(path.join(__dirname, "public", f)
 app.get("/experto/:slug", page("mk-experto.html"));
 app.get("/reserva/:token", page("mk-reserva.html"));
 app.get("/experto-panel/:token", page("mk-panel.html"));
+app.get("/evento/:token", page("mk-evento.html"));
 
 // Estáticos: HTML/JS/CSS siempre se revalidan (ETag) para que un despliegue nuevo se vea al instante.
 app.use(express.static(path.join(__dirname, "public"), {

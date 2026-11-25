@@ -15,7 +15,7 @@ window.MK = (() => {
   }
   const date = (s) => (s ? new Date(s).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" }) : "");
   const nav = `<header class="nav"><div class="container"><a href="/" class="logo"><span class="logo-mark">🍷</span> Alex Solutions <span style="color:var(--muted);font-weight:500">Expertos</span></a>
-    <nav class="nav-links"><a href="/expertos">Buscar expertos</a><a href="/unete">Ofrece tus servicios</a><a href="/contacto">Contacto</a><a href="/login" class="btn btn-ghost btn-sm">Entrar</a></nav></div></header>`;
+    <nav class="nav-links"><a href="/eventos">Eventos</a><a href="/expertos">Buscar expertos</a><a href="/unete">Ofrece tus servicios</a><a href="/contacto">Contacto</a><a href="/login" class="btn btn-ghost btn-sm">Entrar</a></nav></div></header>`;
   const footer = `<footer class="site"><div class="container"><span>© ${new Date().getFullYear()} <b>Alex Solutions, Inc</b> · Marketplace de expertos en licencias de licor y layout · Chicago</span><span><a href="/">Inicio</a> · <a href="/asesoria-layout">Guía de layout</a> · <a href="/contacto">Contacto</a> · <a href="/privacidad">Privacidad</a> · <a href="/terminos">Términos</a></span></div></footer>`;
   function chrome() {
     document.body.insertAdjacentHTML("afterbegin", nav);

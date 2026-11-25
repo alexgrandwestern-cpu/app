@@ -401,7 +401,7 @@ function catOwnHtml(own) {
   const isMix = catState.cat === "mixers";
   return `<div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">${isMix ? "Mi catálogo de mixers y suministros" : "Mis productos guardados"}</h3><button class="btn btn-ghost btn-sm" id="cat-add">+ Agregar producto</button></div>
     ${own.length ? `<div class="table-wrap"><table class="tbl"><thead><tr><th>Producto</th><th>Tipo</th><th>Proveedor / distribuidor</th><th class="num">Precio</th><th></th></tr></thead><tbody>${own.map((p) => `<tr>
-      <td class="biz">${esc(p.name)}<small>${esc([p.brand, p.size].filter(Boolean).join(" · "))}${p.notes ? " · " + esc(p.notes) : ""}</small></td><td>${esc(p.type || "—")}</td>
+      <td class="biz">${esc(p.name)}${p.events ? ' <span class="pill">🎉 Eventos</span>' : ""}<small>${esc([p.brand, p.size].filter(Boolean).join(" · "))}${p.notes ? " · " + esc(p.notes) : ""}</small></td><td>${esc(p.type || "—")}</td>
       <td>${esc(p.supplier || "—")}${p.url ? `<br><a class="small" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Ver producto ↗</a>` : ""}</td><td class="num">${esc(p.price || "—")}</td>
       <td><div class="actions"><button class="btn btn-ghost btn-sm" data-ce="${esc(p.id)}">✏️</button><button class="btn btn-ghost btn-sm" data-cd="${esc(p.id)}">✕</button></div></td></tr>`).join("")}</tbody></table></div>`
       : `<p class="muted" style="margin:0">${isMix ? "Aún no hay productos. Agrega los mixers, jarabes, cristalería y herramientas que vendes o recomiendas." : "Guarda aquí productos que vendes o recomiendas, con su proveedor y precio."}</p>`}
@@ -415,6 +415,7 @@ function catEditForm(p = {}) {
     <div class="frow"><div class="fgroup"><label>Proveedor / distribuidor</label><input name="supplier" class="inp" value="${esc(p.supplier || "")}"></div><div class="fgroup"><label>Precio</label><input name="price" class="inp" value="${esc(p.price || "")}" placeholder="Ej.: $12.50"></div></div>
     <div class="fgroup"><label>Enlace (https)</label><input name="url" class="inp" value="${esc(p.url || "")}"></div>
     <div class="fgroup"><label>Notas</label><input name="notes" class="inp" value="${esc(p.notes || "")}"></div>
+    <label class="check"><input type="checkbox" name="events" ${p.events ? "checked" : ""}> 🎉 Ofrecer este producto en eventos (aparece en /eventos con su precio)</label>
     <div class="actions"><button class="btn btn-primary btn-sm">Guardar</button><button type="button" class="btn btn-ghost btn-sm" id="cat-cancel">Cancelar</button></div></form>`;
 }
 async function loadCatalog(ev) {
@@ -454,10 +455,93 @@ function openCatEdit(p) {
   $("#cat-cancel").addEventListener("click", () => ($("#cat-edit").innerHTML = ""));
   $("#cat-edit-form").addEventListener("submit", async (ev) => {
     ev.preventDefault();
-    const body = { ...Object.fromEntries(new FormData(ev.target)), cat: catState.cat, id: p.id };
+    const body = { ...Object.fromEntries(new FormData(ev.target)), cat: catState.cat, id: p.id, events: ev.target.events.checked };
     try { await api("/api/trade/catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); loadCatalog(); }
     catch (err) { alert(err.message); }
   });
+}
+
+// ---------- Eventos ----------
+const EV_ST = { new: "🆕 Nueva", proposal: "📨 Propuesta enviada", accepted: "✅ Aceptada", declined: "✖ Rechazada", completed: "🎉 Completada", cancelled: "Cancelada" };
+const EV_CAT = { liquors: "Licores", wines: "Vinos", beers: "Cervezas", mixers: "Mixers y suministros de bar" };
+let evData = null, pkBound = false;
+async function loadEvents() {
+  evData = await api("/api/ev/admin");
+  const r = evData.requests, n = (st) => r.filter((x) => x.status === st).length;
+  $("#count-ev").textContent = n("new") || "";
+  $("#ev-kpis").innerHTML = `
+    <div class="kpi hl"><div class="v">${n("new")}</div><div class="l">solicitudes nuevas</div></div>
+    <div class="kpi"><div class="v">${n("proposal")}</div><div class="l">propuestas esperando respuesta</div></div>
+    <div class="kpi"><div class="v">${n("accepted")}</div><div class="l">eventos confirmados</div></div>
+    <div class="kpi"><div class="v">${r.reduce((a, x) => a + (["accepted", "completed"].includes(x.status) ? x.guests : 0), 0).toLocaleString("en-US")}</div><div class="l">invitados en eventos confirmados</div></div>`;
+  $("#ev-tbl tbody").innerHTML = r.map((e) => `<tr data-ev="${esc(e.id)}"><td>${esc(e.date || "Por definir")}</td>
+    <td class="biz">${esc(e.name)}<small>${esc(e.email)}${e.phone ? " · " + esc(e.phone) : ""}</small></td>
+    <td class="hide-sm">${esc(e.eventType)}<br><span class="muted small">${e.guests} invitados · ${e.hours} h</span></td>
+    <td class="hide-md">${esc(e.packageName || "A la medida")}${e.products.length ? `<br><span class="muted small">${e.products.length} productos</span>` : ""}</td>
+    <td><span class="status">${EV_ST[e.status]}</span></td></tr>`).join("")
+    || `<tr><td colspan="5" class="muted" style="text-align:center;padding:24px">Aún no hay solicitudes. Comparte tu página <a href="/eventos" target="_blank" rel="noopener">/eventos</a> con tus clientes.</td></tr>`;
+  $$("#ev-tbl tr[data-ev]").forEach((tr) => { tr.tabIndex = 0; tr.addEventListener("click", () => openEvent(tr.dataset.ev)); tr.addEventListener("keydown", (k) => { if (k.key === "Enter") openEvent(tr.dataset.ev); }); });
+  renderPackages(evData.packages);
+}
+function pkRow(p = {}) {
+  return `<div class="svc pk-row"><div class="frow"><div class="fgroup"><label>Nombre</label><input class="inp" data-k="name" value="${esc(p.name || "")}" maxlength="60"></div>
+    <div class="fgroup"><label>Precio por persona (USD, opcional)</label><input class="inp" data-k="pricePerPerson" type="number" min="0" value="${p.pricePerPerson ?? ""}"></div></div>
+    <input type="hidden" data-k="id" value="${esc(p.id || "")}">
+    <div class="fgroup"><label>Incluye (uno por línea)</label><textarea class="inp" data-k="includes" rows="4">${esc((p.includes || []).join("\n"))}</textarea></div>
+    <button type="button" class="link" data-pk-del>Quitar paquete</button></div>`;
+}
+function renderPackages(list) {
+  $("#pk-list").innerHTML = list.map(pkRow).join("");
+  $$("#pk-list [data-pk-del]").forEach((b) => b.addEventListener("click", () => b.closest(".pk-row").remove()));
+  if (pkBound) return;
+  pkBound = true;
+  $("#pk-add").addEventListener("click", () => { $("#pk-list").insertAdjacentHTML("beforeend", pkRow({})); const last = $$("#pk-list .pk-row").pop(); last.querySelector("[data-pk-del]").addEventListener("click", () => last.remove()); });
+  $("#pk-form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const items = $$("#pk-list .pk-row").map((row) => Object.fromEntries([...row.querySelectorAll("[data-k]")].map((i) => [i.dataset.k, i.dataset.k === "includes" ? i.value.split("\n") : i.value])));
+    try { const r = await api("/api/ev/admin/packages", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items }) }); renderPackages(r.items); $("#pk-msg").textContent = "Paquetes guardados ✓"; }
+    catch (err) { $("#pk-msg").textContent = err.message; }
+  });
+}
+function openEvent(id) {
+  const e = evData.requests.find((x) => x.id === id);
+  if (!e) return;
+  const link = location.origin + e.link, p = e.proposal || {};
+  $("#drawer-body").innerHTML = `
+    <div class="d-hero"><button class="close" id="d-close" aria-label="Cerrar">✕</button>
+      <span class="pill" style="background:rgba(255,255,255,.15);color:#fff">${esc(EV_ST[e.status])}</span>
+      <h2>${esc(e.eventType)} · ${e.guests} invitados</h2><div style="opacity:.85">${esc(e.date || "Fecha por definir")}${e.startTime ? " · " + esc(e.startTime) : ""} · ${e.hours} h</div></div>
+    <div class="d-body">
+      <div class="d-section"><h4>Cliente</h4><dl class="kv"><dt>Nombre</dt><dd>${esc(e.name)}${e.company ? " · " + esc(e.company) : ""}</dd>
+        <dt>Correo</dt><dd><a href="mailto:${esc(e.email)}">${esc(e.email)}</a></dd>${e.phone ? `<dt>Teléfono</dt><dd><a href="tel:${esc(e.phone)}">${esc(e.phone)}</a></dd>` : ""}</dl></div>
+      <div class="d-section"><h4>Evento</h4><dl class="kv"><dt>Servicio</dt><dd>${esc(e.serviceLevel)}</dd><dt>Lugar</dt><dd>${esc(e.venue || "—")}</dd><dt>Presupuesto</dt><dd>${esc(e.budget || "—")}</dd>
+        <dt>Paquete</dt><dd>${esc(e.packageName || "A la medida")}</dd>${e.estimate ? `<dt>Estimación</dt><dd>${e.estimate.drinks} bebidas · ${e.estimate.beer} cervezas · ${e.estimate.wine} vinos · ${e.estimate.spirits} licores</dd>` : ""}
+        ${e.message ? `<dt>Detalles</dt><dd style="white-space:pre-line">${esc(e.message)}</dd>` : ""}</dl>
+        ${e.products.length ? `<ul class="reasons" style="margin-top:10px">${e.products.map((x) => `<li>${x.qty} × ${esc(x.name)} <span class="muted small">${esc(EV_CAT[x.cat] || x.cat)}${x.price ? " · " + esc(x.price) : ""}</span></li>`).join("")}</ul>` : ""}</div>
+      <div class="d-section"><h4>Propuesta para el cliente</h4>
+        <form id="ev-prop">
+          <div class="fgroup"><label>Precio total</label><input class="inp" name="total" value="${esc(p.total || "")}" placeholder="Ej.: $4,800 (impuestos incluidos)"></div>
+          <div class="fgroup"><label>Detalle (qué incluye, condiciones, anticipo)</label><textarea class="inp" name="message" rows="6">${esc(p.message || "")}</textarea></div>
+          <div class="fgroup"><label>Válida hasta</label><input class="inp" type="date" name="validUntil" value="${esc(p.validUntil || "")}"></div>
+          <button class="btn btn-primary btn-sm">${p.sentAt ? "Actualizar y reenviar propuesta" : "📨 Enviar propuesta"}</button>
+        </form>
+        <p class="muted small">El cliente la ve en su enlace privado y puede aceptarla o rechazarla. Avísale por WhatsApp o correo:</p>
+        <div class="actions"><button class="btn btn-ghost btn-sm" id="ev-copy" type="button">🔗 Copiar enlace del cliente</button>
+          ${e.phone ? `<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${esc(e.phone.replace(/[^\d]/g, ""))}?text=${encodeURIComponent((EN() ? `Hi ${e.name}, your event proposal from Alex Solutions is ready: ` : `Hola ${e.name}, tu propuesta de evento de Alex Solutions está lista: `) + link)}">💬 WhatsApp</a>` : ""}
+          <a class="btn btn-ghost btn-sm" href="mailto:${esc(e.email)}?subject=${encodeURIComponent(EN() ? "Your event proposal — Alex Solutions" : "Tu propuesta de evento — Alex Solutions")}&body=${encodeURIComponent(link)}">✉️ Correo</a></div>
+      </div>
+      <div class="d-section"><h4>Estado y notas internas</h4>
+        <select class="inp" id="ev-status">${Object.entries(EV_ST).map(([k, l]) => `<option value="${k}" ${k === e.status ? "selected" : ""}>${l}</option>`).join("")}</select>
+        <textarea class="inp" id="ev-notes" rows="3" style="margin-top:8px" placeholder="Notas internas (el cliente no las ve)">${esc(e.adminNotes || "")}</textarea>
+        <button class="btn btn-ghost btn-sm" id="ev-save" type="button" style="margin-top:8px">Guardar</button>
+      </div>
+    </div>`;
+  $("#d-close").addEventListener("click", closeDrawer);
+  $("#ev-copy").addEventListener("click", () => navigator.clipboard?.writeText(link).then(() => ($("#ev-copy").textContent = "¡Enlace copiado!")));
+  const put = async (body) => { await api(`/api/ev/admin/request/${e.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); await loadEvents(); openEvent(id); };
+  $("#ev-prop").addEventListener("submit", async (ev) => { ev.preventDefault(); try { await put({ proposal: Object.fromEntries(new FormData(ev.target)) }); } catch (err) { alert(err.message); } });
+  $("#ev-save").addEventListener("click", async () => { try { await put({ status: $("#ev-status").value, adminNotes: $("#ev-notes").value }); } catch (err) { alert(err.message); } });
+  $("#drawer").classList.add("show"); $("#drawer-bg").classList.add("show"); $("#drawer").scrollTop = 0;
 }
 
 // ---------- Ficha ----------
@@ -568,7 +652,7 @@ $$(".tab").forEach((t) => t.addEventListener("click", () => {
   refreshTab();
 }));
 function refreshTab() {
-  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: async () => { await loadDist(); await loadNetwork(); }, radar: loadRadar, catalog: loadCatalog }[state.tab];
+  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: async () => { await loadDist(); await loadNetwork(); }, radar: loadRadar, catalog: loadCatalog, events: loadEvents }[state.tab];
   run().then(hideError).catch((e) => { if (e.message === "loading") { $("#loading").classList.add("show"); waitForData().then(() => refreshTab()); return; } console.error(e); showError(); });
 }
 // Mensaje de error visible con opción de reintentar

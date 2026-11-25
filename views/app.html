@@ -56,6 +56,7 @@
         <button class="tab" data-tab="map">Mapa</button>
         <button class="tab" data-tab="pipeline">Pipeline <span class="count" id="count-pipe"></span></button>
         <button class="tab" data-tab="market">Marketplace <span class="count" id="count-mk"></span></button>
+        <button class="tab" data-tab="events">Eventos <span class="count" id="count-ev"></span></button>
         <button class="tab" data-tab="catalog">Productos</button>
         <button class="tab" data-tab="radar">Radar de productos</button>
         <button class="tab" data-tab="dist">Distribuidores</button>
@@ -129,6 +130,16 @@
         <div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">Red de distribuidores de Illinois <span class="muted small" id="net-meta"></span></h3><input id="net-q" aria-label="Filtrar distribuidores" placeholder="Filtrar por nombre, ciudad o marca" class="inp" style="max-width:280px"></div>
           <div id="net-map" style="height:380px;border-radius:12px;margin-bottom:12px"></div><div id="net-list" class="table-wrap"></div></div>
         <div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">Directorio de marcas</h3><button class="btn btn-ghost btn-sm" id="dist-add">+ Agregar manualmente</button></div><div id="dist-all"></div></div>
+      </section>
+
+      <section class="tabpane" id="tab-events">
+        <div class="list-head"><span class="muted">Solicitudes de planificación de eventos con servicio completo.</span>
+          <span><a class="btn btn-ghost btn-sm" href="/eventos" target="_blank" rel="noopener">Ver página de eventos ↗</a></span></div>
+        <div class="kpis" id="ev-kpis"></div>
+        <div class="table-wrap card flush"><table class="tbl hover" id="ev-tbl"><thead><tr><th>Fecha del evento</th><th>Cliente</th><th class="hide-sm">Evento</th><th class="hide-md">Paquete</th><th>Estado</th></tr></thead><tbody></tbody></table></div>
+        <div class="card"><div class="list-head" style="margin:0 0 10px"><h3 style="margin:0">Paquetes</h3><button class="btn btn-ghost btn-sm" id="pk-add" type="button">+ Agregar paquete</button></div>
+          <p class="muted small" style="margin:-4px 0 12px">Lo que ven los clientes en /eventos. Deja el precio vacío para mostrar "Precio según tu evento". Para ofrecer productos específicos, márcalos con 🎉 en la pestaña Productos.</p>
+          <form id="pk-form"><div id="pk-list"></div><button class="btn btn-primary btn-sm" type="submit">Guardar paquetes</button> <span id="pk-msg" class="muted small"></span></form></div>
       </section>
 
       <section class="tabpane" id="tab-market">

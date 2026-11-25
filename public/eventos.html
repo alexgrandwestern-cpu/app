@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Planificación de eventos con servicio de bar — Alex Solutions, Inc</title>
+  <meta name="description" content="Bodas, fiestas y eventos corporativos en Chicago con servicio completo de bar: bebidas, bartenders, montaje y permisos. Elige paquete y productos y recibe tu propuesta." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Alex Solutions, Inc" />
+  <meta property="og:title" content="Eventos con servicio completo de bar — Alex Solutions" />
+  <meta property="og:description" content="Planificamos el bar de tu evento: bebidas, bartenders, montaje y permisos. Elige paquete y productos." />
+  <meta property="og:url" content="https://licenciapro-chicago.onrender.com/eventos" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=1200&h=630&q=70" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/mk.css" />
+  <link rel="stylesheet" href="/eventos.css" />
+</head>
+<body class="mk">
+  <section class="ev-hero">
+    <div class="container">
+      <span class="eyebrow">Alex Solutions, Inc · Eventos</span>
+      <h1>Tu evento, con un bar <em>que se recuerda.</em></h1>
+      <p class="lead">Bodas, cumpleaños, quinceañeras y eventos corporativos en Chicago. Planificamos el servicio de bebidas de principio a fin: menú, productos, bartenders, barra, montaje y permisos.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="#solicitar">Planificar mi evento →</a><a class="btn btn-ghost" href="#paquetes">Ver paquetes</a></div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="block" style="padding:56px 0 20px">
+      <div class="grid-3">
+        <div class="feature"><div class="ico">🍸</div><h3>Servicio completo</h3><p>Bebidas, bartenders, barra, cristalería, hielo, mixers y montaje. Tú solo disfrutas.</p></div>
+        <div class="feature"><div class="ico">🧾</div><h3>Elige tus productos</h3><p>Selecciona un paquete y los vinos, licores, cervezas y mixers que quieras. Te enviamos una propuesta con precio.</p></div>
+        <div class="feature"><div class="ico">📋</div><h3>Permisos en regla</h3><p>Si el lugar no tiene licencia, puede requerirse un permiso especial de licor para el evento. Te ayudamos con el trámite.</p></div>
+      </div>
+    </section>
+
+    <section id="paquetes" class="block" style="padding:30px 0">
+      <div class="section-head" style="margin-bottom:22px"><span class="kicker">Paquetes</span><h2>Elige un punto de partida</h2><p>Todos se ajustan a tu evento. El precio final depende de invitados, horas y productos.</p></div>
+      <div class="pkg-grid" id="pkgs"><div class="empty">Cargando…</div></div>
+    </section>
+
+    <section class="block" style="padding:30px 0">
+      <div class="section-head" style="margin-bottom:22px"><span class="kicker">Calculadora</span><h2>¿Cuánta bebida necesito?</h2><p>Estimación de referencia: 2 bebidas por invitado la primera hora y 1 por hora después.</p></div>
+      <div class="panel calc">
+        <div class="f2">
+          <div class="f"><label for="c-guests">Invitados</label><input id="c-guests" type="number" min="1" max="5000" value="100" /></div>
+          <div class="f"><label for="c-hours">Horas de servicio</label><input id="c-hours" type="number" min="1" max="24" value="4" /></div>
+        </div>
+        <div class="f3m">
+          <div class="f"><label for="c-beer">% cerveza</label><input id="c-beer" type="number" min="0" max="100" value="40" /></div>
+          <div class="f"><label for="c-wine">% vino</label><input id="c-wine" type="number" min="0" max="100" value="35" /></div>
+          <div class="f"><label for="c-spirits">% licores / cócteles</label><input id="c-spirits" type="number" min="0" max="100" value="25" /></div>
+        </div>
+        <div class="calc-out" id="c-out" aria-live="polite"></div>
+        <p class="fine" style="text-align:left">Referencia: 1 botella de vino ≈ 5 copas · 1 botella de licor de 750 ml ≈ 16 tragos · 1 cerveza = 1 bebida · hielo ≈ 1 lb por invitado. Es una estimación: tu propuesta final la ajusta Alex.</p>
+      </div>
+    </section>
+
+    <section id="solicitar" class="block" style="padding:30px 0 70px">
+      <div class="section-head" style="margin-bottom:22px"><span class="kicker">Solicitud</span><h2>Cuéntanos de tu evento</h2><p>Sin compromiso. Te enviamos una propuesta con precio a un enlace privado donde podrás aceptarla.</p></div>
+      <form class="panel form" id="evf">
+        <div id="err"></div>
+        <h3 class="sub-h">El evento</h3>
+        <div class="f2"><div class="f"><label for="eventType">Tipo de evento</label><select id="eventType" name="eventType"></select></div><div class="f"><label for="serviceLevel">Servicio</label><select id="serviceLevel" name="serviceLevel"></select></div></div>
+        <div class="f2"><div class="f"><label for="date">Fecha</label><input id="date" type="date" name="date" /></div><div class="f"><label for="startTime">Hora de inicio</label><input id="startTime" type="time" name="startTime" /></div></div>
+        <div class="f2"><div class="f"><label for="guests">Invitados *</label><input id="guests" type="number" name="guests" min="1" max="5000" required /></div><div class="f"><label for="hours">Horas de servicio *</label><input id="hours" type="number" name="hours" min="1" max="24" required /></div></div>
+        <div class="f2"><div class="f"><label for="venue">Lugar o dirección</label><input id="venue" name="venue" maxlength="200" /></div><div class="f"><label for="budget">Presupuesto aproximado</label><input id="budget" name="budget" maxlength="60" placeholder="Ej.: $3,000–$5,000" /></div></div>
+
+        <h3 class="sub-h">Paquete</h3>
+        <div class="pkg-pick" id="pkgPick"></div>
+
+        <h3 class="sub-h">Productos <span class="muted small" style="font-weight:500">(opcional)</span></h3>
+        <div id="prodPick"></div>
+
+        <h3 class="sub-h">Tus datos</h3>
+        <div class="f2"><div class="f"><label for="name">Nombre *</label><input id="name" name="name" required maxlength="80" /></div><div class="f"><label for="company">Empresa (opcional)</label><input id="company" name="company" maxlength="100" /></div></div>
+        <div class="f2"><div class="f"><label for="email">Correo *</label><input id="email" type="email" name="email" required maxlength="120" /></div><div class="f"><label for="phone">Teléfono</label><input id="phone" name="phone" maxlength="40" /></div></div>
+        <div class="f"><label for="message">Detalles</label><textarea id="message" name="message" rows="4" maxlength="2000" placeholder="Cócteles favoritos, marcas preferidas, restricciones, decoración de la barra…"></textarea></div>
+        <button class="btn btn-primary" type="submit" style="margin-top:8px">Solicitar propuesta</button>
+        <p class="consent">Al enviar aceptas los <a href="/terminos">términos de uso</a> y el <a href="/privacidad">aviso de privacidad</a>. El servicio de alcohol es solo para mayores de 21 años.</p>
+      </form>
+    </section>
+  </main>
+  <script src="/mk.js"></script>
+  <script src="/js/eventos.js"></script>
+  <script src="/i18n.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ import { filterProspects, stats, facets, toCSV } from "./lib/query.js";
 import { ask, aiEnabled } from "./lib/assistant.js";
 import { marketplaceRouter } from "./lib/marketplace.js";
 import { distributorsRouter } from "./lib/distributors.js";
+import { tradeRouter, syncTrade } from "./lib/trade.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -204,6 +205,9 @@ api.post("/refresh", (req, res) => {
 });
 app.use("/api/mk", marketplaceRouter(requireAuth));
 app.use("/api/dist", distributorsRouter(requireAuth));
+app.use("/api/trade", tradeRouter(requireAuth, () => ds));
+setTimeout(syncTrade, 15000);
+setInterval(syncTrade, 24 * 3600 * 1000);
 app.use("/api", api);
 
 // Páginas del marketplace con parámetros en la URL

@@ -293,6 +293,102 @@ async function runResearch(q) {
   catch (err) { out.innerHTML = `<div class="card"><p style="margin:0">${esc(err.message)}</p></div>`; }
 }
 
+// ---------- Red de distribuidores de Illinois (TTB) ----------
+let netMap, netLayer, netBound = false, netData = [];
+async function loadNetwork() {
+  if (!netBound) {
+    netBound = true;
+    let t; $("#net-q").addEventListener("input", () => { clearTimeout(t); t = setTimeout(renderNetwork, 250); });
+  }
+  const d = await api("/api/trade/distributors");
+  netData = d.items;
+  $("#net-meta").textContent = d.permitsAt ? `· ${fmt(d.total)} empresas con permiso federal de mayorista (TTB, ${new Date(d.permitsAt).toLocaleDateString("es-MX")})` : "· descargando datos de la TTB…";
+  if (window.L && !netMap) {
+    netMap = L.map("net-map", { preferCanvas: true }).setView([41.88, -87.9], 9);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution: "© OpenStreetMap · © CARTO", maxZoom: 19 }).addTo(netMap);
+  }
+  setTimeout(() => netMap?.invalidateSize(), 50);
+  renderNetwork();
+}
+function renderNetwork() {
+  const q = $("#net-q").value.trim().toLowerCase();
+  const list = q ? netData.filter((g) => `${g.company} ${g.owner} ${g.sites.map((s) => s.city).join(" ")} ${g.brands.map((b) => b.brand).join(" ")}`.toLowerCase().includes(q)) : netData;
+  if (netMap) {
+    netLayer?.remove();
+    netLayer = L.layerGroup(list.flatMap((g) => g.sites.filter((s) => s.lat).map((s) => L.circleMarker([s.lat, s.lon], { radius: g.brands.length ? 8 : 5, color: "#fff", weight: 1, fillColor: g.brands.length ? "#7a1f2b" : "#6b4fa0", fillOpacity: .85 })
+      .bindPopup(`<b>${esc(g.company)}</b><br>${esc(s.street)}, ${esc(s.city)} ${esc(s.zip)}<br><span style="color:#6b6359">Permiso ${esc(s.permit)}</span>${g.brands.length ? `<br>Marcas: ${g.brands.map((b) => esc(b.brand)).join(", ")}` : ""}`)))).addTo(netMap);
+  }
+  $("#net-list").innerHTML = `<table class="tbl"><thead><tr><th>Empresa</th><th>Sedes en IL</th><th>Marcas en tu directorio</th><th></th></tr></thead><tbody>${list.slice(0, 150).map((g) => `<tr>
+    <td class="biz">${esc(g.company)}${g.owner && g.owner !== g.company ? `<small>${esc(g.owner)}</small>` : ""}</td>
+    <td>${g.sites.slice(0, 3).map((s) => esc(s.city)).join(", ")}${g.sites.length > 3 ? ` +${g.sites.length - 3}` : ""}</td>
+    <td>${g.brands.map((b) => `${b.status === "verified" ? "✅" : "⚠️"} ${esc(b.brand)}`).join(", ") || '<span class="muted">—</span>'}</td>
+    <td><a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://www.google.com/search?q=${encodeURIComponent(g.company + " Illinois distributor contact")}">🔎 Contacto</a></td></tr>`).join("")}</tbody></table>${list.length > 150 ? `<p class="muted small">Mostrando 150 de ${fmt(list.length)}. Usa el filtro para encontrar más.</p>` : ""}`;
+}
+
+// ---------- Radar de productos nuevos (TTB COLA) ----------
+const radar = { page: 1, group: "", bound: false };
+async function loadRadar() {
+  if (!radar.bound) {
+    radar.bound = true;
+    let t; $("#radar-q").addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => { radar.page = 1; loadRadar(); }, 300); });
+    $("#radar-days").addEventListener("change", () => { radar.page = 1; loadRadar(); });
+    $("#radar-imp").addEventListener("change", () => { radar.page = 1; loadRadar(); });
+    $("#radar-prev").addEventListener("click", () => { radar.page--; loadRadar(); });
+    $("#radar-next").addEventListener("click", () => { radar.page++; loadRadar(); });
+  }
+  const p = new URLSearchParams({ q: $("#radar-q").value.trim(), days: $("#radar-days").value, imported: $("#radar-imp").checked, group: radar.group, page: radar.page });
+  const [d, s] = await Promise.all([api(`/api/trade/products?${p}`), api("/api/trade/status")]);
+  $("#radar-meta").innerHTML = s.colaAt ? `Última actualización: <b>${new Date(s.colaAt).toLocaleString("es-MX")}</b>.` : `⏳ ${esc(s.message || "Descargando etiquetas de la TTB… la primera vez tarda unos minutos.")}`;
+  const groups = Object.entries(d.counts).sort((a, b) => b[1] - a[1]);
+  $("#radar-groups").innerHTML = [["", Object.values(d.counts).reduce((a, b) => a + b, 0)], ...groups].map(([g, n]) => `<button class="chip ${g === radar.group ? "on" : ""}" data-g="${esc(g)}">${esc(g || "Todos")} <span class="muted">${fmt(n)}</span></button>`).join("");
+  $$("#radar-groups .chip").forEach((c) => c.addEventListener("click", () => { radar.group = c.dataset.g; radar.page = 1; loadRadar(); }));
+  $("#radar-tbl tbody").innerHTML = d.items.map((x) => `<tr data-id="${esc(x.id)}"><td>${esc(x.date)}</td>
+    <td class="biz">${esc(x.brand)}<small>${esc(x.fanciful)}</small></td><td class="hide-sm">${esc(x.group)}<br><span class="muted small">${esc(x.classDesc)}</span></td>
+    <td class="hide-md">${esc(x.origin)}</td><td class="hide-sm">${x.supplier ? esc(x.supplier) + `<br><span class="muted small">${esc(x.supplierCity)}</span>` : `<span class="muted small">Permiso ${esc(x.permit)}</span>`}</td></tr>`).join("")
+    || `<tr><td colspan="5" class="muted" style="text-align:center;padding:24px">${s.colaAt ? "Sin productos con estos filtros." : "Cargando el radar por primera vez…"}</td></tr>`;
+  $$("#radar-tbl tbody tr[data-id]").forEach((tr) => tr.addEventListener("click", () => openProduct(tr.dataset.id)));
+  const pages = Math.max(1, Math.ceil(d.total / 50));
+  $("#radar-page").textContent = `${fmt(d.total)} productos · página ${radar.page} de ${fmt(pages)}`;
+  $("#radar-prev").disabled = radar.page <= 1; $("#radar-next").disabled = radar.page >= pages;
+}
+async function openProduct(id) {
+  const d = await api(`/api/trade/product/${encodeURIComponent(id)}`);
+  const p = d.product, dir = d.directory, acc = d.accounts;
+  const distHtml = dir ? `${dir.distributors.map((x) => `<b>${esc(x.name)}</b>${x.territory ? " · " + esc(x.territory) : ""}`).join("<br>") || "No identificado"}<br><span class="status ${dir.status === "verified" ? "st-cliente" : "st-interesado"}">${dir.status === "verified" ? "✅ Verificado" : "⚠️ Sin verificar"}</span>`
+    : `<span class="muted">Aún no sabemos quién la distribuye en Illinois.</span><br><button class="btn btn-primary btn-sm" id="p-research" style="margin-top:8px">🔍 Investigar distribuidor</button>`;
+  $("#drawer-body").innerHTML = `
+    <div class="d-hero"><button class="close" id="d-close" aria-label="Cerrar">✕</button>
+      <span class="pill" style="background:rgba(255,255,255,.15);color:#fff">${esc(p.group)} · ${esc(p.origin)}</span>
+      <h2>${esc(p.brand)}</h2><div style="opacity:.85">${esc(p.fanciful)}</div>
+      <div style="opacity:.75;margin-top:6px;font-size:13px">Etiqueta aprobada ${esc(p.date)} · ${esc(p.classDesc)}</div></div>
+    <div class="d-body">
+      <div class="d-section"><h4>Mapa de conexiones</h4>
+        <div class="chain">
+          <div class="node"><span>🏭 Proveedor / importador</span><b>${esc(p.supplier || "—")}</b><small>${p.supplier ? esc(p.supplierCity) : "Permiso " + esc(p.permit)}</small></div>
+          <div class="arrow">↓</div>
+          <div class="node"><span>🚚 Distribuidor en Illinois</span><div>${distHtml}</div></div>
+          <div class="arrow">↓</div>
+          <div class="node"><span>🍽️ Cuentas sugeridas en Chicago</span><b>${fmt(acc.total)} negocios con licencia de licor</b><small>Encajan por tipo: ${esc([...acc.fit.cuisines, ...acc.fit.types].join(", ") || "bares y tiendas")}</small></div>
+        </div>
+      </div>
+      <div class="d-section"><h4>Cuentas para presentar este producto</h4>
+        ${acc.items.slice(0, 15).map((a) => `<div class="topitem" style="margin-bottom:6px"><span class="tier tier-B" style="font-size:11px">${a.type.startsWith("Tienda") ? "🛒" : a.type.startsWith("Bar") ? "🍸" : "🍽️"}</span><div class="t"><b>${esc(a.name)}</b><span class="muted small">${esc(a.address)} · ${esc(a.area)} · ${esc(a.cuisine)}</span></div></div>`).join("") || '<p class="muted">Sin cuentas que encajen.</p>'}
+        <p class="muted small">Ideas: preséntale estas cuentas al distribuidor o al importador como oportunidad de colocación, o lleva el producto a tus clientes con licencia.</p>
+      </div>
+      <div class="d-section actions">
+        <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="${esc(d.colaUrl)}">📄 Ver etiqueta en TTB</a>
+        <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://www.google.com/search?q=${encodeURIComponent(`${p.brand} ${p.fanciful} ${p.supplier}`)}">🔎 Buscar en Google</a>
+      </div>
+    </div>`;
+  $("#d-close").addEventListener("click", closeDrawer);
+  $("#p-research")?.addEventListener("click", async () => {
+    const b = $("#p-research"); b.disabled = true; b.textContent = "Investigando… (20–60 s)";
+    try { await api("/api/dist/research", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ brand: p.brand }) }); openProduct(id); }
+    catch (err) { b.disabled = false; b.textContent = "🔍 Investigar distribuidor"; alert(err.message); }
+  });
+  $("#drawer").classList.add("show"); $("#drawer-bg").classList.add("show"); $("#drawer").scrollTop = 0;
+}
+
 // ---------- Ficha ----------
 function inviteLink(p) {
   const q = new URLSearchParams({ negocio: p.name, direccion: `${p.address}, Chicago ${p.zip}`, p: p.id });
@@ -386,7 +482,7 @@ $$(".tab").forEach((t) => t.addEventListener("click", () => {
   refreshTab();
 }));
 function refreshTab() {
-  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: loadDist }[state.tab];
+  const run = { overview: loadOverview, list: loadList, map: loadMap, pipeline: async () => renderPipeline(), market: loadMarket, dist: async () => { await loadDist(); await loadNetwork(); }, radar: loadRadar }[state.tab];
   run().catch((e) => console.error(e));
 }
 function refreshAll() {

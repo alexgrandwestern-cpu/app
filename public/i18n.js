@@ -22,7 +22,7 @@
     "Alex Solutions, Inc": "Alex Solutions, Inc", "Datos:": "Data:", "Datos en vivo": "Live data", "Español, English": "Spanish, English",
 
     // ---------- Página principal ----------
-    "LicenciaPro Chicago — Licencias de licor para restaurantes | Alex Zavala": "LicenciaPro Chicago — Liquor licenses for restaurants | Alex Zavala",
+    "Alex Solutions, Inc — Licencias de licor para restaurantes en Chicago | Alex Zavala": "Alex Solutions, Inc — Liquor licenses for Chicago restaurants | Alex Zavala",
     "Alex Solutions, Inc · Por Alex Zavala · Chicago": "Alex Solutions, Inc · By Alex Zavala · Chicago",
     "Tu restaurante merece": "Your restaurant deserves", "servir una copa.": "to pour a drink.",
     "Ayudo a restaurantes de Chicago a obtener su licencia de licor sin vueltas: expediente, zonificación, inspecciones y BASSET. Y con inteligencia artificial encuentro a los negocios que más la necesitan.": "I help Chicago restaurants get their liquor license without the runaround: application, zoning, inspections and BASSET. And with artificial intelligence I find the businesses that need it most.",
@@ -35,7 +35,7 @@
     "Expediente completo": "Complete application", "Preparamos documentos, seguro de responsabilidad, antecedentes y la capacitación BASSET de tu equipo.": "We prepare documents, liability insurance, background checks and BASSET training for your team.",
     "Seguimiento hasta la aprobación": "Follow-up until approval", "Coordinamos inspecciones y respondemos a la ciudad para que abras la barra lo antes posible.": "We coordinate inspections and respond to the city so you can open your bar as soon as possible.",
     "La plataforma": "The platform", "Inteligencia de prospectos con datos oficiales de la ciudad.": "Prospect intelligence built on official city data.",
-    "Cada día, LicenciaPro descarga todas las licencias activas de Chicago, las cruza con las inspecciones sanitarias y detecta qué restaurantes todavía no tienen licencia de licor.": "Every day, LicenciaPro downloads all active Chicago licenses, cross-checks them with health inspections and detects which restaurants still lack a liquor license.",
+    "Cada día, Alex Solutions descarga todas las licencias activas de Chicago, las cruza con las inspecciones sanitarias y detecta qué restaurantes todavía no tienen licencia de licor.": "Every day, Alex Solutions downloads all active Chicago licenses, cross-checks them with health inspections and detects which restaurants still lack a liquor license.",
     "+50,000 negocios evaluados": "50,000+ businesses evaluated", "Cruce automático de licencias por cuenta y ubicación para encontrar a quién le falta la licencia de licor.": "Automatic matching of licenses by account and location to find who is missing a liquor license.",
     "Puntaje de oportunidad": "Opportunity score", "Cada prospecto recibe 0–100 según comedor, tipo de cocina, patio, antigüedad, inspecciones y zona.": "Each prospect gets a 0–100 score based on dining room, cuisine, patio, age, inspections and area.",
     "Segmentos y mapa": "Segments and map", "Filtra por barrio, código postal, ward, tipo de cocina y segmento. Míralo todo en un mapa interactivo.": "Filter by neighborhood, ZIP code, ward, cuisine and segment. See it all on an interactive map.",
@@ -52,20 +52,20 @@
     "📏 Calculadora de espacio vs. ventas": "📏 Space vs. sales calculator", "Reasigna metros de estante por categoría según ventas y margen.": "Reallocate shelf space by category based on sales and margin.",
     "✅ Autodiagnóstico de 15 prácticas": "✅ 15-practice self-assessment", "Puntaje de 0 a 100 y tus 3 prioridades, más un plan paso a paso.": "A 0–100 score and your top 3 priorities, plus a step-by-step plan.",
     "Ver la guía de layout →": "See the layout guide →", "Hablar con Alex": "Talk to Alex", "¿Listo para encontrar tus próximos clientes?": "Ready to find your next clients?",
-    "Entra a la plataforma y descubre los restaurantes que te están esperando.": "Log in to the platform and discover the restaurants waiting for you.", "Entrar a LicenciaPro →": "Log in to LicenciaPro →",
-    "· LicenciaPro Chicago · Creado por": "· LicenciaPro Chicago · Created by", "Datos en vivo": "Live data",
+    "Entra a la plataforma y descubre los restaurantes que te están esperando.": "Log in to the platform and discover the restaurants waiting for you.", "Entrar a Alex Solutions →": "Log in to Alex Solutions →",
+    "· Chicago · Creado por": "· Chicago · Created by", "Datos en vivo": "Live data",
     "Comedor de restaurante con clientes": "Restaurant dining room with guests", "Skyline de Chicago": "Chicago skyline", "Restaurante con mesas": "Restaurant with tables",
     "Platillo servido en restaurante": "Dish served at a restaurant", "Brindis con copas de vino tinto": "Toast with glasses of red wine",
     "Información orientativa; confirma requisitos con BACP.": "Guidance only; confirm requirements with BACP.",
 
     // ---------- Login ----------
-    "Entrar — LicenciaPro Chicago": "Log in — LicenciaPro Chicago", "“Cada restaurante sin licencia de licor es una conversación esperando a suceder.”": "“Every restaurant without a liquor license is a conversation waiting to happen.”",
+    "Entrar — Alex Solutions, Inc": "Log in — Alex Solutions, Inc", "“Cada restaurante sin licencia de licor es una conversación esperando a suceder.”": "“Every restaurant without a liquor license is a conversation waiting to happen.”",
     "Datos oficiales de la Ciudad de Chicago · actualizados a diario": "Official City of Chicago data · updated daily", "Bienvenido, Alex": "Welcome, Alex",
     "Entra para ver tus prospectos.": "Log in to see your prospects.", "Usuario": "Username", "Contraseña": "Password", "← Volver al inicio": "← Back to home",
     "Demasiados intentos. Espera 15 minutos.": "Too many attempts. Wait 15 minutes.", "Usuario o contraseña incorrectos.": "Incorrect username or password.",
 
     // ---------- Panel ----------
-    "Panel — LicenciaPro Chicago": "Dashboard — LicenciaPro Chicago", "🍷 Layout": "🍷 Layout", "🪪 Mi tarjeta": "🪪 My card", "↻ Actualizar": "↻ Refresh", "☰ Filtros": "☰ Filters",
+    "Panel — Alex Solutions, Inc": "Dashboard — Alex Solutions, Inc", "🍷 Layout": "🍷 Layout", "🪪 Mi tarjeta": "🪪 My card", "↻ Actualizar": "↻ Refresh", "☰ Filtros": "☰ Filters",
     "Filtros": "Filters", "Limpiar": "Clear", "Prioridad": "Priority", "Alta": "High", "Media": "Medium", "Baja": "Low", "Segmento": "Segment",
     "Tipo de cocina": "Cuisine", "Área comunitaria": "Community area", "Puntaje mínimo:": "Minimum score:", "Solo negocios nuevos (≤ 24 meses)": "New businesses only (≤ 24 months)",
     "Con patio exterior": "With outdoor patio", "Incluir cadenas e instituciones": "Include chains and institutions", "⬇ Exportar CSV": "⬇ Export CSV",
@@ -197,7 +197,7 @@
     "Abrir en el teléfono — Alex Solutions": "Open on your phone — Alex Solutions", "Escanea con la cámara de tu teléfono": "Scan with your phone's camera",
     "Apunta la cámara al código y toca el enlace que aparece.": "Point the camera at the code and tap the link that appears.", "Mi panel": "My dashboard",
     "Prospectos, marketplace, distribuidores y asistente (pide usuario y contraseña)": "Prospects, marketplace, distributors and assistant (requires username and password)",
-    "Página principal": "Home page", "La página pública de LicenciaPro": "LicenciaPro's public page", "Buscar y reservar expertos": "Find and book experts", "Mi tarjeta": "My card",
+    "Página principal": "Home page", "La página pública de Alex Solutions, Inc": "Alex Solutions, Inc's public page", "Buscar y reservar expertos": "Find and book experts", "Mi tarjeta": "My card",
     "Tarjeta de contacto para compartir": "Contact card to share",
 
     // ---------- Guía de layout ----------

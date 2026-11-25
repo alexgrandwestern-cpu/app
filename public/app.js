@@ -394,13 +394,28 @@ function inviteLink(p) {
   const q = new URLSearchParams({ negocio: p.name, direccion: `${p.address}, Chicago ${p.zip}`, p: p.id });
   return `${location.origin}/experto/alex-zavala?${q}`;
 }
+const EN = () => window.I18N?.lang === "en";
+const tt = (s) => (window.I18N ? I18N.t(s) : s);
 function layoutPitch(p) {
+  if (EN()) {
+    if (p.segment === "Tienda / Grocery") return "With Package Goods: store floor plan, power wall, coolers in the back and a price ladder for wine and spirits.";
+    if (p.segment === "Restaurante con comedor") return "Bar and back-bar design, visible drink menu and premium bottle display.";
+    if (p.segment === "Café y bebidas") return "Wine and craft beer display by the counter and a pairing menu.";
+    return "Bottle display, coolers and impulse buys at checkout.";
+  }
   if (p.segment === "Tienda / Grocery") return "Con Package Goods: plano de tienda, muro de poder, refrigerados al fondo y escalera de precios para vinos y licores.";
   if (p.segment === "Restaurante con comedor") return "Diseño de barra y contrabarra, carta de bebidas visible y exhibición de botellas premium.";
   if (p.segment === "Café y bebidas") return "Exhibición de vino y cerveza artesanal junto al mostrador y menú de maridajes.";
   return "Exhibición de botellas, refrigeradores y compras de impulso en caja.";
 }
 function callScript(p) {
+  if (EN()) return `Hi, am I speaking with the owner or manager of ${p.name}?
+My name is Alex Zavala. I help restaurants here in ${p.area} get their liquor license from the City of Chicago.
+I noticed ${p.name} doesn't have a license to serve alcohol yet${p.licenses.includes("Outdoor Patio") ? ", and you already have an outdoor patio — that's the perfect combination" : ""}.
+Many ${p.cuisine !== "Otra / Sin identificar" ? tt(p.cuisine) : "food"} businesses raise their average check by offering beer, wine or cocktails.
+I handle the entire process (${tt(p.recommended)}): documents, zoning, insurance, BASSET and inspections.
+And with Alex Solutions I can also help you set up ${p.segment === "Tienda / Grocery" ? "the store" : "the bar"} so drinks sell themselves.
+Could I stop by this week for 15 minutes to give you a free assessment?`;
   return `Hola, ¿hablo con el dueño o gerente de ${p.name}?
 Mi nombre es Alex Zavala. Ayudo a restaurantes aquí en ${p.area} a obtener su licencia de licor con la Ciudad de Chicago.
 Vi que ${p.name} todavía no tiene licencia para servir alcohol${p.licenses.includes("Outdoor Patio") ? ", y que ya tienen patio exterior — es la combinación perfecta" : ""}.
@@ -450,7 +465,7 @@ async function openProspect(id) {
       <div class="d-section"><h4>Invitar a reservar en el marketplace</h4>
         <p class="muted small" style="margin:0 0 8px">Envía este enlace por WhatsApp o correo: abre tu perfil con el nombre y la dirección del negocio ya llenos.</p>
         <div class="actions"><button class="btn btn-primary btn-sm" id="d-invite">🔗 Copiar enlace de reserva</button>
-        <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(`Hola, soy Alex Zavala. Le ayudo a ${p.name} a obtener su licencia de licor. Reserve un diagnóstico aquí: ${inviteLink(p)}`)}">💬 Enviar por WhatsApp</a></div>
+        <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(EN() ? `Hi, this is Alex Zavala. I help ${p.name} get its liquor license. Book an assessment here: ${inviteLink(p)}` : `Hola, soy Alex Zavala. Le ayudo a ${p.name} a obtener su licencia de licor. Reserve un diagnóstico aquí: ${inviteLink(p)}`)}">💬 Enviar por WhatsApp</a></div>
       </div>
       <div class="d-section"><h4>Guion de llamada sugerido</h4><div class="script">${esc(callScript(p))}</div>
         <button class="btn btn-ghost btn-sm" id="d-copy" style="margin-top:8px">Copiar guion</button></div>
@@ -516,7 +531,7 @@ async function send(text) {
   addMsg("user", text); chat.push({ role: "user", content: text });
   const t = addMsg("bot", "Pensando…"); t.classList.add("typing");
   try {
-    const d = await api("/api/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: chat }) });
+    const d = await api("/api/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: chat, lang: window.I18N?.lang || "es" }) });
     t.classList.remove("typing"); t.innerHTML = md(d.answer); chat.push({ role: "assistant", content: d.answer });
   } catch (e) { t.textContent = e.message === "loading" ? "Los datos aún se están cargando, intenta en un momento." : "Error al contactar al asistente."; }
   $("#ai-msgs").scrollTop = 1e9;

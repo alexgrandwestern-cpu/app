@@ -193,7 +193,7 @@ api.get("/export.csv", (req, res) => {
 });
 api.post("/assistant", async (req, res) => {
   try {
-    res.json(await ask(ds, Array.isArray(req.body?.messages) ? req.body.messages : []));
+    res.json(await ask(ds, Array.isArray(req.body?.messages) ? req.body.messages : [], req.body?.lang === "en" ? "en" : "es"));
   } catch (e) {
     console.error(e);
     res.status(500).json({ answer: "Ocurrió un error con el asistente." });
